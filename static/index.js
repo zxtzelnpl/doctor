@@ -23,8 +23,7 @@ const handleClick = async (e) => {
     }
 
     const data = await response.json();
-    // 假设后端返回的数据中，数值字段为 value
-    const len = data.value?.length ?? '-';
+    const len = data.value?.data?.length ?? '-';
     numberSpan.textContent = len;
   } catch (error) {
     console.error('获取数据出错:', error);

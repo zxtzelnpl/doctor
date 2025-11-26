@@ -27,18 +27,18 @@ const init = async () => {
   if (!indicator) return;
 
   // 2. 根据indicator参数发起请求，获取数据
-  const data = await fetchData(indicator);
-  if (!data || !Array.isArray(data)) return;
+  const value = await fetchData(indicator);
+  if (!value || !Array.isArray(value.data)) return;
 
   // 3. 将数据的长度放到id为indicator的元素中
   const indicatorEl = document.getElementById('indicator');
-  if (indicatorEl) indicatorEl.textContent = data.length;
+  if (indicatorEl) indicatorEl.textContent = value.data.length;
 
   // 4. 将data渲染到对应的表格中，表格的header为data每一行数据的key
   const detailsEl = document.getElementById('details');
   if (!detailsEl) return;
 
-  const keys = data.length > 0 ? Object.keys(data[0]) : [];
+  const headers = Array.isArray(value.headers) ? value.headers : [];
   const table = document.createElement('table');
   table.className = 'min-w-full table-auto border-collapse';
 
@@ -46,7 +46,7 @@ const init = async () => {
   const thead = document.createElement('thead');
   thead.className = 'bg-gray-100';
   const headerRow = document.createElement('tr');
-  keys.forEach(key => {
+  headers.forEach(key => {
     const th = document.createElement('th');
     th.textContent = key;
     th.className = 'px-4 py-2 text-left whitespace-nowrap border border-gray-200';
@@ -57,10 +57,10 @@ const init = async () => {
 
   // 表体
   const tbody = document.createElement('tbody');
-  data.forEach(row => {
+  value.data.forEach(row => {
     const tr = document.createElement('tr');
     tr.className = 'odd:bg-white even:bg-gray-50';
-    keys.forEach(key => {
+    headers.forEach(key => {
       const td = document.createElement('td');
       td.textContent = row[key] ?? '';
       td.className = 'px-4 py-2 whitespace-nowrap border border-gray-200';

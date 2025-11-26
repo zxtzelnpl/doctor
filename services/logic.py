@@ -66,18 +66,20 @@ def get_special(data: list):
                 next_res.append(sorted_data[i])
     return next_res
 
-def get_indicator_value(indicator: str) -> int:
-    # 先从内存缓存中读取数据
-    if not hasattr(get_indicator_value, '_cached_data'):
+def get_indicator_value(indicator: str):
+    if not hasattr(get_indicator_value, '_cached_sheet'):
         sheet = get_sheet("./files/2024年病案首页.xlsx", 0)
-        get_indicator_value._cached_data = sheet["data"]
-    data = get_indicator_value._cached_data
+        get_indicator_value._cached_sheet = sheet
+    sheet = get_indicator_value._cached_sheet
+    data = sheet["data"]
+    headers = sheet["headers"]
     match indicator:
         case '24':
-            return get_no_24(data)
+            result = get_no_24(data)
         case '27':
-            return get_no_27(data)
+            result = get_no_27(data)
         case 'special':
-            return get_special(data)
+            result = get_special(data)
         case _:
-            return None
+            result = None
+    return None if result is None else {"headers": headers, "data": result}
