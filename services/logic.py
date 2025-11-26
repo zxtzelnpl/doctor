@@ -76,10 +76,7 @@ def get_indicators():
     ]
 
 def get_indicator_value(indicator: str):
-    if not hasattr(get_indicator_value, '_cached_sheet'):
-        sheet = get_sheet("./files/2024年病案首页.xlsx", 0)
-        get_indicator_value._cached_sheet = sheet
-    sheet = get_indicator_value._cached_sheet
+    sheet = get_sheet("./files/2024年病案首页.xlsx", 0)
     data = sheet["data"]
     headers = sheet["headers"]
     match indicator:

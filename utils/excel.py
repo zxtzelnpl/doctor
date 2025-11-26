@@ -3,6 +3,13 @@ import openpyxl
 from io import BytesIO
 
 def get_sheet(path: str, number: int = 0):
+    key = (path, number)
+    if not hasattr(get_sheet, '_cache'):
+        get_sheet._cache = {}
+    cache = get_sheet._cache
+    if key in cache:
+        return cache[key]
+
     book = openpyxl.load_workbook(path, number)
     sheetnames = book.sheetnames
     sheet = book[sheetnames[number]]
@@ -16,10 +23,12 @@ def get_sheet(path: str, number: int = 0):
         row_dict = {headers[i]: row[i] for i in range(len(headers))}
         data.append(row_dict)
 
-    return {
+    result = {
         "headers": headers,
         "data": data,
     }
+    cache[key] = result
+    return result
 
 def export_sheet(title: str, headers: list, data: list):
     wb = openpyxl.Workbook()
