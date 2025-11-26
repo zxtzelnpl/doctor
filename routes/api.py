@@ -1,4 +1,3 @@
-from utils.excel import get_sheet
 from flask import request
 from flask import Blueprint, jsonify
 from services.logic import get_indicator_value
