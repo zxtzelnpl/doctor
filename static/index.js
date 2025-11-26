@@ -4,6 +4,16 @@ const indicators = [
   'special',
 ];
 
+const createExportHandler = (indicator) => () => {
+  const url = `/api/indicator/export?indicator=${encodeURIComponent(indicator)}`;
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
 const handleClick = async (e) => {
   const btn = e.target;
   const text = btn.previousElementSibling.textContent;
@@ -52,8 +62,10 @@ const init =  () => {
     number.classList.add('number');
     number.textContent = '-';
 
-
-
+    const exportBtn = document.createElement('button');
+    exportBtn.classList.add('export-btn');
+    exportBtn.textContent = '导出Excel';
+    exportBtn.addEventListener('click', createExportHandler(indicator), false);
     const link = document.createElement('a');
     link.classList.add('link');
     link.textContent = '明细页面';
@@ -63,6 +75,7 @@ const init =  () => {
     box.appendChild(text);
     box.appendChild(btn);
     box.appendChild(number);
+    box.appendChild(exportBtn);
     box.appendChild(link);
 
     app.appendChild(box);
