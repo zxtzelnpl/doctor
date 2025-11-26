@@ -1,6 +1,6 @@
 from flask import request
 from flask import Blueprint, jsonify, send_file
-from services.logic import get_indicator_value
+from services.logic import get_indicator_value, get_indicators
 from utils.excel import export_sheet
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
@@ -13,6 +13,10 @@ def get_indicator():
         return jsonify({'error': 'indicator is required'}), 400
     value = get_indicator_value(indicator)
     return jsonify({'indicator': indicator, 'value': value})
+
+@api_bp.get('/indicators')
+def list_indicators():
+    return jsonify({'indicators': get_indicators()})
 
 @api_bp.get('/indicator/export')
 def export_indicator():

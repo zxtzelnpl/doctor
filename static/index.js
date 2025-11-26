@@ -1,8 +1,13 @@
-const indicators = [
-  '24',
-  '27',
-  'special',
-];
+const loadIndicators = async () => {
+  try {
+    const res = await fetch('/api/indicators');
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data.indicators) ? data.indicators : [];
+  } catch {
+    return [];
+  }
+};
 
 const createExportHandler = (indicator) => () => {
   const url = `/api/indicator/export?indicator=${encodeURIComponent(indicator)}`;
@@ -41,9 +46,10 @@ const handleClick = async (e) => {
   }
 }
 
-const init =  () => {
+const init =  async () => {
   const app = document.getElementById('app');
 
+  const indicators = await loadIndicators();
   for (const indicator of indicators) {
 
     const box = document.createElement('div');
@@ -69,7 +75,7 @@ const init =  () => {
     const link = document.createElement('a');
     link.classList.add('link');
     link.textContent = '明细页面';
-    link.href = '/data?indicator=' + indicator;
+    link.href = '/data?indicator=' + encodeURIComponent(indicator);
     link.target = '_blank';
 
     box.appendChild(text);
