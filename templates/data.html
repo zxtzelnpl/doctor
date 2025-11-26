@@ -5,11 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='data.css') }}" type="text/css">
-  <title>Document</title>
+  <title>数据明细</title>
 </head>
 <body class="min-w-full">
   <div id="app" class="p-4">
-    <h2 class="text-lg font-semibold">数据明细<span id="indicator"></span></h2>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold">数据明细：<span id="indicator" class="text-blue-600"></span></h2>
+      <button id="download-btn" class="px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700">下载Excel</button>
+    </div>
     <div id="details" class="table-container overflow-x-auto"></div>
   </div>
 </body>

@@ -26,13 +26,20 @@ const init = async () => {
   const indicator = params.get('indicator');
   if (!indicator) return;
 
-  // 2. 根据indicator参数发起请求，获取数据
+  // 2. 在标题处显示indicator参数，并绑定下载按钮
+  const indicatorEl = document.getElementById('indicator');
+  if (indicatorEl) indicatorEl.textContent = indicator;
+  const downloadBtn = document.getElementById('download-btn');
+  if (downloadBtn) {
+    downloadBtn.onclick = () => {
+      const url = `/api/indicator/export?indicator=${encodeURIComponent(indicator)}`;
+      window.location.href = url;
+    };
+  }
+
+  // 3. 根据indicator参数发起请求，获取数据
   const value = await fetchData(indicator);
   if (!value || !Array.isArray(value.data)) return;
-
-  // 3. 将数据的长度放到id为indicator的元素中
-  const indicatorEl = document.getElementById('indicator');
-  if (indicatorEl) indicatorEl.textContent = value.data.length;
 
   // 4. 将data渲染到对应的表格中，表格的header为data每一行数据的key
   const detailsEl = document.getElementById('details');
@@ -73,6 +80,8 @@ const init = async () => {
   // 5. 表格放到id为details的元素中
   detailsEl.innerHTML = '';
   detailsEl.appendChild(table);
+
+  // 6. 数据已渲染
 }
 
 
