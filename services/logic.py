@@ -5,8 +5,8 @@ from typing import Counter
 from utils.excel import get_diagnosis_names
 
 
-# 计算第24行指标的数据
-def get_no_24(data: list):
+# 24行 - 因异位妊娠死亡的患者例数
+def 因异位妊娠死亡的患者例数(data: list):
     diagnosis_names = get_diagnosis_names('异位妊娠')
 
     filtered_data = [
@@ -17,7 +17,8 @@ def get_no_24(data: list):
     ]
     return filtered_data
 
-def get_no_27(data: list):
+# 27行 - 同期妇科恶性肿瘤住院患者总例数
+def 同期妇科恶性肿瘤住院患者总例数(data: list):
     diagnosis_names = get_diagnosis_names('妇科恶性肿瘤')
 
     filtered_data = [
@@ -27,7 +28,8 @@ def get_no_27(data: list):
     ]
     return filtered_data
 
-def get_special(data: list): 
+# 34行 - 出院31天内非预期再住院患者人次数
+def 出院31天内非预期再住院患者人次数(data: list): 
     # 1. 筛选「出院科室」包含「呼吸」的数据
     filtered_data = [
         item for item in data
@@ -66,6 +68,13 @@ def get_special(data: list):
                 next_res.append(sorted_data[i])
     return next_res
 
+def get_indicators():
+    return [
+        '因异位妊娠死亡的患者例数',
+        '同期妇科恶性肿瘤住院患者总例数'
+        '出院31天内非预期再住院患者人次数',
+    ]
+
 def get_indicator_value(indicator: str):
     if not hasattr(get_indicator_value, '_cached_sheet'):
         sheet = get_sheet("./files/2024年病案首页.xlsx", 0)
@@ -74,12 +83,12 @@ def get_indicator_value(indicator: str):
     data = sheet["data"]
     headers = sheet["headers"]
     match indicator:
-        case '24':
-            result = get_no_24(data)
-        case '27':
-            result = get_no_27(data)
-        case 'special':
-            result = get_special(data)
+        case '因异位妊娠死亡的患者例数':
+            result = 因异位妊娠死亡的患者例数(data)
+        case '同期妇科恶性肿瘤住院患者总例数':
+            result = 同期妇科恶性肿瘤住院患者总例数(data)
+        case '出院31天内非预期再住院患者人次数':
+            result = 出院31天内非预期再住院患者人次数(data)
         case _:
             result = None
     return None if result is None else {"headers": headers, "data": result}
