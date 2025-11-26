@@ -40,15 +40,16 @@ const init = async () => {
 
   const keys = data.length > 0 ? Object.keys(data[0]) : [];
   const table = document.createElement('table');
-  table.border = '1';
-  table.style.borderCollapse = 'collapse';
+  table.className = 'min-w-full table-auto border-collapse';
 
   // 表头
   const thead = document.createElement('thead');
+  thead.className = 'bg-gray-100';
   const headerRow = document.createElement('tr');
   keys.forEach(key => {
     const th = document.createElement('th');
     th.textContent = key;
+    th.className = 'px-4 py-2 text-left whitespace-nowrap border border-gray-200';
     headerRow.appendChild(th);
   });
   thead.appendChild(headerRow);
@@ -58,9 +59,11 @@ const init = async () => {
   const tbody = document.createElement('tbody');
   data.forEach(row => {
     const tr = document.createElement('tr');
+    tr.className = 'odd:bg-white even:bg-gray-50';
     keys.forEach(key => {
       const td = document.createElement('td');
       td.textContent = row[key] ?? '';
+      td.className = 'px-4 py-2 whitespace-nowrap border border-gray-200';
       tr.appendChild(td);
     });
     tbody.appendChild(tr);

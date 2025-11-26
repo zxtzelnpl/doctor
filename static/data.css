@@ -1,0 +1,13 @@
+* { box-sizing: border-box; }
+
+#app { padding: 16px; }
+
+.table-container { width: 100%; overflow-x: auto; overflow-y: hidden; }
+
+table { width: auto; min-width: 100%; border-collapse: collapse; table-layout: auto; }
+
+thead th { background: #f7f7f7; font-weight: 600; }
+
+th, td { border: 1px solid #ddd; padding: 8px 12px; vertical-align: top; white-space: nowrap; }
+
+tbody tr:nth-child(even) { background: #fafafa; }
