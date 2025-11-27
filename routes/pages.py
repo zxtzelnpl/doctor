@@ -9,3 +9,7 @@ def index():
 @pages_bp.route('/data')
 def data():
     return render_template('data.html')
+
+@pages_bp.route('/filter')
+def filter_page():
+    return render_template('filter.html')

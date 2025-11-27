@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>筛选明细</title>
+  <style>
+    .table-container { max-height: 70vh; }
+  </style>
+</head>
+<body class="min-w-full">
+  <div id="app" class="p-4 space-y-4">
+    <h2 class="text-lg font-semibold">筛选明细</h2>
+
+    <form id="filter-form" class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+      <div>
+        <label class="block text-sm text-gray-600">病案号</label>
+        <input name="病案号" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">病人姓名</label>
+        <input name="病人姓名" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">性别</label>
+        <input name="性别" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-600">入院日期起</label>
+        <input type="date" name="入院日期_start" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">入院日期止</label>
+        <input type="date" name="入院日期_end" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">出院日期起</label>
+        <input type="date" name="出院日期_start" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">出院日期止</label>
+        <input type="date" name="出院日期_end" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-600">出院科室</label>
+        <input name="出院科室" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">主诊断</label>
+        <input name="主诊断" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">主手术</label>
+        <input name="主手术" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-600">治疗结果</label>
+        <input name="治疗结果" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">主治医师</label>
+        <input name="主治医师" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">住院医生</label>
+        <input name="住院医生" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-600">审核</label>
+        <input name="审核" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">联系人</label>
+        <input name="联系人" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">联系地址</label>
+        <input name="联系地址" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-600">身份证号</label>
+        <input name="身份证号" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">住院天数</label>
+        <input name="住院天数" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">病人性质</label>
+        <input name="病人性质" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-600">总费用</label>
+        <input name="总费用" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">药费</label>
+        <input name="药费" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">现住址</label>
+        <input name="现住址" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-600">电话号码</label>
+        <input name="电话号码" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+
+      <div class="md:col-span-3 flex gap-2">
+        <button type="button" id="apply-btn" class="px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700">筛选</button>
+        <button type="button" id="reset-btn" class="px-3 py-1.5 rounded bg-gray-200 text-gray-800 hover:bg-gray-300">重置</button>
+      </div>
+    </form>
+
+    <div id="details" class="table-container overflow-x-auto"></div>
+  </div>
+  <script src="{{ url_for('static', filename='filter.js') }}"></script>
+</body>
+</html>
