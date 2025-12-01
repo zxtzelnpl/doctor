@@ -1,6 +1,7 @@
 import datetime
 import openpyxl
 from io import BytesIO
+from typing import TypedDict, NotRequired, List
 
 def get_sheet(path: str, number: int = 0):
     key = (path, number)
@@ -64,3 +65,25 @@ def get_diagnosis_names(name: str):
     names = [item['名称'] for item in filter_item]
     
     return names
+
+class SheetSpec(TypedDict):
+    path: str
+    number: NotRequired[int]
+
+def get_sheets(sheets: List[SheetSpec]):
+    headers_all = []
+    seen = set()
+    data_all = []
+    for sheet in sheets:
+        result = get_sheet(sheet["path"], sheet.get("number", 0))
+        headers = result["headers"]
+        data = result["data"]
+        for h in headers:
+            if h not in seen:
+                seen.add(h)
+                headers_all.append(h)
+        data_all.extend(data)
+    return {
+        "headers": headers_all,
+        "data": data_all,
+    }
