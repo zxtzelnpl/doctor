@@ -17,3 +17,12 @@ body { background: #f7f8fa; color: #1f2937 }
 
 .link { color: #2563eb; text-decoration: none; font-size: 14px }
 .link:hover { text-decoration: underline }
+
+.details { width: 100% }
+.dept { width: 100%; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e7eb }
+.dept-header { display: flex; align-items: center; gap: 8px; font-weight: 600; color: #111827 }
+.dept-total { color: #6b7280; font-weight: 500 }
+.tree { list-style: none; margin: 6px 0 0; padding: 0 }
+.year { margin-top: 4px; color: #111827 }
+.months { list-style: none; margin: 4px 0 0 12px; padding: 0; color: #6b7280; font-size: 13px }
+.tag { display: inline-block; background: #eef2ff; color: #3730a3; border: 1px solid #e0e7ff; padding: 2px 6px; border-radius: 999px; font-size: 12px }
