@@ -1,4 +1,5 @@
 import datetime
+import os
 import openpyxl
 from io import BytesIO
 from typing import TypedDict, NotRequired, List
@@ -87,3 +88,47 @@ def get_sheets(sheets: List[SheetSpec]):
         "headers": headers_all,
         "data": data_all,
     }
+
+_ALL_FILES_CACHE = None
+_ALL_FILES_CACHE_SIGNATURE = None
+
+def _files_signature(base: str = './files'):
+    if not os.path.isdir(base):
+        return ()
+    items = []
+    for name in os.listdir(base):
+        if not name.lower().endswith('.xlsx'):
+            continue
+        if name.startswith('~'):
+            continue
+        p = os.path.join(base, name)
+        try:
+            m = os.path.getmtime(p)
+        except Exception:
+            m = 0
+        items.append((name, m))
+    items.sort()
+    return tuple(items)
+
+def list_excel_files(base: str = './files') -> List[SheetSpec]:
+    res: List[SheetSpec] = []
+    if os.path.isdir(base):
+        for name in os.listdir(base):
+            if not name.lower().endswith('.xlsx'):
+                continue
+            if name.startswith('~'):
+                continue
+            res.append({"path": os.path.join(base, name)})
+    return res
+
+def get_all_files_sheets(base: str = './files'):
+    global _ALL_FILES_CACHE, _ALL_FILES_CACHE_SIGNATURE
+    sig = _files_signature(base)
+    if _ALL_FILES_CACHE is None or _ALL_FILES_CACHE_SIGNATURE != sig:
+        sheets = list_excel_files(base)
+        if not sheets:
+            _ALL_FILES_CACHE = {"headers": [], "data": []}
+        else:
+            _ALL_FILES_CACHE = get_sheets(sheets)
+        _ALL_FILES_CACHE_SIGNATURE = sig
+    return _ALL_FILES_CACHE
