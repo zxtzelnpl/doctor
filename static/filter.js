@@ -19,8 +19,12 @@ const applyParamsToForm = (form, params) => {
 };
 
 const fetchSheet = async (params) => {
-  const url = '/api/sheet' + (params && params.toString() ? `?${params.toString()}` : '');
-  const res = await fetch(url);
+  const payload = Object.fromEntries(params.entries());
+  const res = await fetch('/api/sheet', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
   if (!res.ok) throw new Error('请求失败');
   return await res.json();
 };

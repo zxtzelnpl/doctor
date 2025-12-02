@@ -1,6 +1,6 @@
 const loadIndicators = async () => {
   try {
-    const res = await fetch('/api/indicators');
+    const res = await fetch('/api/indicators', { method: 'POST' });
     if (!res.ok) return [];
     const data = await res.json();
     return Array.isArray(data.indicators) ? data.indicators : [];
@@ -26,7 +26,7 @@ const handleClick = async (e) => {
   const details = btn.parentElement.querySelector('.details');
 
   try {
-    const response = await fetch('/api/indicator', {
+    const response = await fetch('/api/get_indicator_data', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

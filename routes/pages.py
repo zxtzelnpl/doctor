@@ -13,3 +13,7 @@ def data():
 @pages_bp.route('/filter')
 def filter_page():
     return render_template('filter.html')
+
+@pages_bp.route('/indicators')
+def indicators_page():
+    return render_template('indicators.html')

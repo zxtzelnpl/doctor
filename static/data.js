@@ -1,7 +1,7 @@
 
 const fetchData = async (indicator) => {
   try {
-    const response = await fetch('/api/indicator', {
+    const response = await fetch('/api/get_indicator_data', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -40,6 +40,41 @@ const init = async () => {
   // 3. 根据indicator参数发起请求，获取数据
   const value = await fetchData(indicator);
   if (!value || !Array.isArray(value.data)) return;
+  const admitStart = params.get('入院日期_start');
+  const admitEnd = params.get('入院日期_end');
+  const dischargeStart = params.get('出院日期_start');
+  const dischargeEnd = params.get('出院日期_end');
+  const dept = params.get('出院科室');
+  const year = params.get('year');
+  const month = params.get('month');
+  const matchAdmission = (row) => {
+    if (!admitStart && !admitEnd) return true;
+    const v = row['入院日期'];
+    if (!v) return false;
+    const d = dayjs(String(v));
+    if (!d.isValid()) return false;
+    if (admitStart && d.isBefore(dayjs(admitStart))) return false;
+    if (admitEnd && d.isAfter(dayjs(admitEnd))) return false;
+    return true;
+  };
+  const matchDischarge = (row) => {
+    if (!dischargeStart && !dischargeEnd && !year && !month) return true;
+    const v = row['出院日期'];
+    if (!v) return false;
+    const d = dayjs(String(v));
+    if (!d.isValid()) return false;
+    if (dischargeStart && d.isBefore(dayjs(dischargeStart))) return false;
+    if (dischargeEnd && d.isAfter(dayjs(dischargeEnd))) return false;
+    if (year && String(d.year()) !== String(year)) return false;
+    if (month && String(d.month()+1).padStart(2,'0') !== String(month).padStart(2,'0')) return false;
+    return true;
+  };
+  const filteredRows = value.data.filter(r => {
+    if (dept && String(r['出院科室']||'').indexOf(dept) === -1) return false;
+    if (!matchAdmission(r)) return false;
+    if (!matchDischarge(r)) return false;
+    return true;
+  });
 
   // 4. 将data渲染到对应的表格中，表格的header为data每一行数据的key
   const detailsEl = document.getElementById('details');
@@ -64,7 +99,7 @@ const init = async () => {
 
   // 表体
   const tbody = document.createElement('tbody');
-  value.data.forEach(row => {
+  filteredRows.forEach(row => {
     const tr = document.createElement('tr');
     tr.className = 'odd:bg-white even:bg-gray-50';
     headers.forEach(key => {

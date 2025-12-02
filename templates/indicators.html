@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/dayjs@1.11.11/dayjs.min.js"></script>
+  <script src="https://unpkg.com/lodash@4.17.21/lodash.min.js"></script>
+  <title>指标页面</title>
+</head>
+<body class="min-w-full">
+  <div id="app" class="p-4 space-y-4">
+    <h2 class="text-lg font-semibold">指标页面</h2>
+    <form id="filter-form" class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+      <div class="md:col-span-1">
+        <label class="block text-sm text-gray-600">指标</label>
+        <select name="indicator" id="indicator-select" class="mt-1 w-full border px-2 py-1 rounded"></select>
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">入院日期起</label>
+        <input type="date" name="入院日期_start" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">入院日期止</label>
+        <input type="date" name="入院日期_end" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">出院日期起</label>
+        <input type="date" name="出院日期_start" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600">出院日期止</label>
+        <input type="date" name="出院日期_end" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div class="md:col-span-1">
+        <label class="block text-sm text-gray-600">科室</label>
+        <input name="出院科室" class="mt-1 w-full border px-2 py-1 rounded" />
+      </div>
+      <div class="md:col-span-4 flex gap-2">
+        <button type="button" id="apply-btn" class="px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700">筛选</button>
+        <button type="button" id="reset-btn" class="px-3 py-1.5 rounded bg-gray-200 text-gray-800 hover:bg-gray-300">重置</button>
+      </div>
+    </form>
+    <div class="flex items-center gap-2" id="actions"></div>
+    <div id="tree" class="space-y-3"></div>
+  </div>
+  <script src="{{ url_for('static', filename='indicators.js') }}"></script>
+</body>
+</html>
