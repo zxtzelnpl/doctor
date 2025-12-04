@@ -4,11 +4,11 @@ import openpyxl
 from io import BytesIO
 from typing import TypedDict, NotRequired, List
 
-def get_sheet(path: str, number: int = 0):
+def load_sheet(path: str, number: int = 0):
     key = (path, number)
-    if not hasattr(get_sheet, '_cache'):
-        get_sheet._cache = {}
-    cache = get_sheet._cache
+    if not hasattr(load_sheet, '_cache'):
+        load_sheet._cache = {}
+    cache = load_sheet._cache
     if key in cache:
         return cache[key]
 
@@ -55,28 +55,33 @@ def export_sheet(title: str, headers: list, data: list):
         "output": output,
     }
 
-def get_diagnosis_names(name: str):
-    sheet = get_sheet("./files/0妇科-重点专业单病种质控指标.xlsx", 1)
-    data = sheet["data"]
-    # 筛选「字典名称」为‘异位妊娠’的数据，取「名称」字段放入列表
-    filter_item = [
-        item for item in data
-        if str(item.get('字典名称')) == name
+def get_all_departments(data: list):
+    header = '出院病房(CYBF)'
+    # 收集所有非空的入院病房值
+    departments = [
+        str(item[header])
+        for item in data
+        if header in item and item[header] is not None and str(item[header]).strip() != ''
     ]
-    names = [item['名称'] for item in filter_item]
-    
-    return names
+    # 去重并保持原顺序
+    seen = set()
+    unique_departments = []
+    for dept in departments:
+        if dept not in seen:
+            seen.add(dept)
+            unique_departments.append(dept)
+    return unique_departments
 
 class SheetSpec(TypedDict):
     path: str
     number: NotRequired[int]
 
-def get_sheets(sheets: List[SheetSpec]):
+def load_sheets(sheets: List[SheetSpec]):
     headers_all = []
     seen = set()
     data_all = []
     for sheet in sheets:
-        result = get_sheet(sheet["path"], sheet.get("number", 0))
+        result = load_sheet(sheet["path"], sheet.get("number", 0))
         headers = result["headers"]
         data = result["data"]
         for h in headers:
@@ -129,6 +134,6 @@ def get_all_files_sheets(base: str = './files'):
         if not sheets:
             _ALL_FILES_CACHE = {"headers": [], "data": []}
         else:
-            _ALL_FILES_CACHE = get_sheets(sheets)
+            _ALL_FILES_CACHE = load_sheets(sheets)
         _ALL_FILES_CACHE_SIGNATURE = sig
     return _ALL_FILES_CACHE

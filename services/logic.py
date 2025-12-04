@@ -4,7 +4,6 @@ from collections import defaultdict
 from typing import Counter
 from utils.excel import get_diagnosis_names
 
-
 # 24行 - 因异位妊娠死亡的患者例数
 def 因异位妊娠死亡的患者例数(data: list):
     diagnosis_names = get_diagnosis_names('异位妊娠')
@@ -89,3 +88,4 @@ def get_indicator_value(indicator: str):
         case _:
             result = None
     return None if result is None else {"headers": headers, "data": result}
+
