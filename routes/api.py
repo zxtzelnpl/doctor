@@ -5,6 +5,9 @@ from services.logic import get_indicator_value
 from utils.excel import export_sheet
 from utils.excel import get_all_files_sheets
 from utils.doctor import filter_datas
+from constants.departments import departmentsByYear
+
+
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -14,6 +17,10 @@ def get_departments_list():
     year = data_in.get('year') or request.args.get('year')
     if not year:
         return jsonify({'error': 'year is required'}), 400
+    
+    if year in departmentsByYear:
+        return jsonify({'departments': departmentsByYear[year]})
+
     all_data = get_all_files_sheets(year)
     return jsonify({'departments': get_all_departments(all_data["data"])})
 

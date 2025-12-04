@@ -3,6 +3,7 @@ from datetime import datetime
 from collections import defaultdict
 from typing import Counter
 from utils.excel import get_diagnosis_names
+from services.breath import get_indicators as get_breath_indicators
 
 # 24行 - 因异位妊娠死亡的患者例数
 def 因异位妊娠死亡的患者例数(data: list):
@@ -89,3 +90,10 @@ def get_indicator_value(indicator: str):
             result = None
     return None if result is None else {"headers": headers, "data": result}
 
+def get_department_indicators(year: str, department: str):
+    if(year == '2025'):
+        if(department == '内科一病区（呼吸）'):
+            return get_breath_indicators()
+    return [
+        'test'
+    ]
