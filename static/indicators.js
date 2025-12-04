@@ -1,6 +1,6 @@
-const loadIndicators = async () => {
+const loadIndicators = async (year, department) => {
   try {
-    const res = await fetch('/api/indicators', { method: 'POST' });
+    const res = await fetch('/api/indicators', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ year, department }) });
     if (!res.ok) return [];
     const data = await res.json();
     return Array.isArray(data.indicators) ? data.indicators : [];
@@ -29,11 +29,11 @@ const applyParamsToForm = (form, params) => {
   }
 };
 
-const fetchIndicatorValue = async (indicator) => {
-  const res = await fetch('/api/get_indicator_data', {
+const fetchIndicatorValue = async (indicator, year, department) => {
+  const res = await fetch('/api/indicator/list', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ indicator })
+    body: JSON.stringify({ indicator, year, department })
   });
   if (!res.ok) return null;
   return await res.json();
@@ -66,9 +66,7 @@ const applyFilters = (rows, params) => {
   const admitEnd = params.get('入院日期_end');
   const dischargeStart = params.get('出院日期_start');
   const dischargeEnd = params.get('出院日期_end');
-  const dept = params.get('出院科室');
   return rows.filter(r => {
-    if (dept && String(r['出院科室'] || '').indexOf(dept) === -1) return false;
     if (!matchAdmissionDate(r, admitStart, admitEnd)) return false;
     if (!matchDischargeDate(r, dischargeStart, dischargeEnd)) return false;
     return true;
@@ -98,77 +96,45 @@ const renderActions = (container, indicator, params) => {
   container.appendChild(detailLink);
 };
 
-const renderHierarchy = (container, rows, indicator, baseParams) => {
+const renderHierarchy = (container, rows, indicator, baseParams, year) => {
   container.innerHTML = '';
   const valid = rows.filter(r => dayjs(r['出院日期']).isValid());
-  const byYear = _.groupBy(valid, r => dayjs(r['出院日期']).format('YYYY'));
-  const years = _.sortBy(_.keys(byYear));
-  for (const y of years) {
-    const yearDiv = document.createElement('div');
-    yearDiv.className = 'border rounded p-3';
-    const top = document.createElement('div');
-    top.className = 'flex items-center gap-3';
-    const title = document.createElement('span');
-    title.textContent = `${y} 年：${byYear[y].length}`;
-    top.appendChild(title);
-    const yearParams = new URLSearchParams(baseParams.toString());
-    yearParams.set('year', y);
-    const yearDownload = document.createElement('button');
-    yearDownload.className = 'px-2 py-1 rounded bg-blue-600 text-white';
-    yearDownload.textContent = '下载详情';
-    yearDownload.onclick = () => {
+  const byMonth = _.groupBy(valid, r => dayjs(r['出院日期']).format('MM'));
+  const months = _.sortBy(_.keys(byMonth));
+  const list = document.createElement('ul');
+  list.className = 'grid grid-cols-2 md:grid-cols-4 gap-2';
+  for (const m of months) {
+    const li = document.createElement('li');
+    li.className = 'flex items-center gap-2';
+    const tag = document.createElement('span');
+    tag.textContent = `${String(year)}-${m} 月：${byMonth[m].length}`;
+    const monthParams = new URLSearchParams(baseParams.toString());
+    monthParams.set('year', year);
+    monthParams.set('month', m);
+    const monthDownload = document.createElement('button');
+    monthDownload.className = 'px-2 py-1 rounded bg-blue-600 text-white';
+    monthDownload.textContent = '下载详情';
+    monthDownload.onclick = () => {
       const u = new URL('/api/indicator/export', window.location.origin);
       u.searchParams.set('indicator', indicator);
-      for (const [k,v] of yearParams.entries()) u.searchParams.set(k, v);
+      for (const [k,v] of monthParams.entries()) u.searchParams.set(k, v);
       window.location.href = u.toString();
     };
-    const yearLink = document.createElement('a');
-    yearLink.className = 'px-2 py-1 rounded bg-gray-200 text-gray-800';
-    yearLink.textContent = '详情页面';
-    const u2 = new URL('/data', window.location.origin);
-    u2.searchParams.set('indicator', indicator);
-    for (const [k,v] of yearParams.entries()) u2.searchParams.set(k, v);
-    yearLink.href = u2.toString();
-    yearLink.target = '_blank';
-    top.appendChild(yearDownload);
-    top.appendChild(yearLink);
-    yearDiv.appendChild(top);
-    const months = _.sortBy(_.keys(_.groupBy(byYear[y], r => dayjs(r['出院日期']).format('MM'))));
-    const list = document.createElement('ul');
-    list.className = 'mt-2 grid grid-cols-2 md:grid-cols-4 gap-2';
-    const monthCount = _.countBy(byYear[y], r => dayjs(r['出院日期']).format('MM'));
-    for (const m of months) {
-      const li = document.createElement('li');
-      li.className = 'flex items-center gap-2';
-      const tag = document.createElement('span');
-      tag.textContent = `${m} 月：${monthCount[m]}`;
-      const monthParams = new URLSearchParams(yearParams.toString());
-      monthParams.set('month', m);
-      const monthDownload = document.createElement('button');
-      monthDownload.className = 'px-2 py-1 rounded bg-blue-600 text-white';
-      monthDownload.textContent = '下载详情';
-      monthDownload.onclick = () => {
-        const u = new URL('/api/indicator/export', window.location.origin);
-        u.searchParams.set('indicator', indicator);
-        for (const [k,v] of monthParams.entries()) u.searchParams.set(k, v);
-        window.location.href = u.toString();
-      };
-      const monthLink = document.createElement('a');
-      monthLink.className = 'px-2 py-1 rounded bg-gray-200 text-gray-800';
-      monthLink.textContent = '详情页面';
-      const u3 = new URL('/data', window.location.origin);
-      u3.searchParams.set('indicator', indicator);
-      for (const [k,v] of monthParams.entries()) u3.searchParams.set(k, v);
-      monthLink.href = u3.toString();
-      monthLink.target = '_blank';
-      li.appendChild(tag);
-      li.appendChild(monthDownload);
-      li.appendChild(monthLink);
-      list.appendChild(li);
-    }
-    yearDiv.appendChild(list);
-    container.appendChild(yearDiv);
+    const monthLink = document.createElement('a');
+    monthLink.className = 'px-2 py-1 rounded bg-gray-200 text-gray-800';
+    monthLink.textContent = '详情页面';
+    const u3 = new URL('/data', window.location.origin);
+    u3.searchParams.set('indicator', indicator);
+    for (const [k,v] of monthParams.entries()) u3.searchParams.set(k, v);
+    monthLink.href = u3.toString();
+    monthLink.target = '_blank';
+    li.appendChild(tag);
+    li.appendChild(monthDownload);
+    li.appendChild(monthLink);
+    list.appendChild(li);
   }
+  container.innerHTML = '';
+  container.appendChild(list);
 };
 
 const init = async () => {
@@ -178,24 +144,30 @@ const init = async () => {
   const applyBtn = document.getElementById('apply-btn');
   const resetBtn = document.getElementById('reset-btn');
   const indicatorSelect = document.getElementById('indicator-select');
-  const indicators = await loadIndicators();
+  const currentParams = new URLSearchParams(window.location.search);
+  const year = currentParams.get('year');
+  const department = currentParams.get('出院科室');
   indicatorSelect.innerHTML = '';
+  if (!year || !department) {
+    tree.innerHTML = '请在链接中提供 year 与 出院科室';
+    return;
+  }
+  const indicators = await loadIndicators(year, department);
   for (const name of indicators) {
     const opt = document.createElement('option');
     opt.value = name;
     opt.textContent = name;
     indicatorSelect.appendChild(opt);
   }
-  const currentParams = new URLSearchParams(window.location.search);
   applyParamsToForm(form, currentParams);
   const load = async () => {
     const indicator = new FormData(form).get('indicator') || indicatorSelect.value || '';
     if (!indicator) return;
-    const res = await fetchIndicatorValue(indicator);
+    const res = await fetchIndicatorValue(indicator, year, department);
     if (!res || !Array.isArray(res.value?.data)) return;
     const rows = applyFilters(res.value.data, currentParams);
     renderActions(actions, indicator, currentParams);
-    renderHierarchy(tree, rows, indicator, currentParams);
+    renderHierarchy(tree, rows, indicator, currentParams, year);
   };
   applyBtn.onclick = async () => {
     const params = buildParamsFromForm(form);
