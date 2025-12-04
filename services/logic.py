@@ -1,4 +1,4 @@
-from utils.excel import get_sheet
+from utils.excel import load_sheet
 from datetime import datetime
 from collections import defaultdict
 from typing import Counter
@@ -75,7 +75,7 @@ def get_indicators():
     ]
 
 def get_indicator_value(indicator: str):
-    sheet = get_sheet("./files/2024年病案首页.xlsx", 0)
+    sheet = load_sheet("./files/2024年病案首页.xlsx", 0)
     data = sheet["data"]
     headers = sheet["headers"]
     match indicator:

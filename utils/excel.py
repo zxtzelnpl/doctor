@@ -97,38 +97,46 @@ def load_sheets(sheets: List[SheetSpec]):
 _ALL_FILES_CACHE = None
 _ALL_FILES_CACHE_SIGNATURE = None
 
-def _files_signature(base: str = './files'):
+def _files_signature(base: str = './files/2022'):
     if not os.path.isdir(base):
         return ()
     items = []
-    for name in os.listdir(base):
-        if not name.lower().endswith('.xlsx'):
-            continue
-        if name.startswith('~'):
-            continue
-        p = os.path.join(base, name)
-        try:
-            m = os.path.getmtime(p)
-        except Exception:
-            m = 0
-        items.append((name, m))
-    items.sort()
-    return tuple(items)
-
-def list_excel_files(base: str = './files') -> List[SheetSpec]:
-    res: List[SheetSpec] = []
-    if os.path.isdir(base):
-        for name in os.listdir(base):
+    # 递归遍历目录
+    for root, _, files in os.walk(base):
+        for name in files:
             if not name.lower().endswith('.xlsx'):
                 continue
             if name.startswith('~'):
                 continue
-            res.append({"path": os.path.join(base, name)})
+            p = os.path.join(root, name)
+            try:
+                m = os.path.getmtime(p)  # 获取文件的最后修改时间戳
+            except Exception:
+                m = 0
+            # 保存相对路径，保持排序一致性
+            rel_path = os.path.relpath(p, base)
+            items.append((rel_path, m))
+    items.sort()
+    return tuple(items)
+
+def list_excel_files(base: str = './files/2022') -> List[SheetSpec]:
+    res: List[SheetSpec] = []
+    if os.path.isdir(base):
+        # 递归遍历目录
+        for root, _, files in os.walk(base):
+            for name in files:
+                if not name.lower().endswith('.xlsx'):
+                    continue
+                if name.startswith('~'):
+                    continue
+                # 保存相对路径，保持与_files_signature一致
+                rel_path = os.path.relpath(os.path.join(root, name), base)
+                res.append({"path": os.path.join(base, rel_path)})
     return res
 
-def get_all_files_sheets(base: str = './files'):
+def get_all_files_sheets(base: str = './files/2022'):
     global _ALL_FILES_CACHE, _ALL_FILES_CACHE_SIGNATURE
-    sig = _files_signature(base)
+    sig = _files_signature(base) 
     if _ALL_FILES_CACHE is None or _ALL_FILES_CACHE_SIGNATURE != sig:
         sheets = list_excel_files(base)
         if not sheets:
@@ -137,3 +145,15 @@ def get_all_files_sheets(base: str = './files'):
             _ALL_FILES_CACHE = load_sheets(sheets)
         _ALL_FILES_CACHE_SIGNATURE = sig
     return _ALL_FILES_CACHE
+
+def get_diagnosis_names(name: str):
+    sheet = load_sheet("./back/0妇科-重点专业单病种质控指标.xlsx", 1)
+    data = sheet["data"]
+    # 筛选「字典名称」为‘异位妊娠’的数据，取「名称」字段放入列表
+    filter_item = [
+        item for item in data
+        if str(item.get('字典名称')) == name
+    ]
+    names = [item['名称'] for item in filter_item]
+    
+    return names

@@ -1,19 +1,17 @@
 from utils.excel import get_all_departments
 from flask import request
 from flask import Blueprint, jsonify, send_file
-from services.logic import get_indicator_value, get_indicators
+from services.logic import get_indicator_value
 from utils.excel import export_sheet
 from utils.excel import get_all_files_sheets
-from utils.base import safe_parse_date
-from utils.doctor import filter_datas, match_dates, get_date_filters
-from datetime import datetime
+from utils.doctor import filter_datas
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 @api_bp.post('/department/list')
 def get_departments_list():
     all_data = get_all_files_sheets()
-    return jsonify({'departments': get_all_departments(all_data)})
+    return jsonify({'departments': get_all_departments(all_data["data"])})
 
 @api_bp.post('/indicator/list')
 def get_indicator_list():
