@@ -10,7 +10,11 @@ api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 @api_bp.post('/department/list')
 def get_departments_list():
-    all_data = get_all_files_sheets()
+    data_in = request.get_json(silent=True) or {}
+    year = data_in.get('year') or request.args.get('year')
+    if not year:
+        return jsonify({'error': 'year is required'}), 400
+    all_data = get_all_files_sheets(year)
     return jsonify({'departments': get_all_departments(all_data["data"])})
 
 @api_bp.post('/indicator/list')
@@ -47,7 +51,11 @@ def export_indicator():
 
 @api_bp.post('/details')
 def get_details():
-    sheet = get_all_files_sheets()
+    data_in = request.get_json(silent=True) or {}
+    year = data_in.get('year') or request.args.get('year')
+    if not year:
+        return jsonify({'error': 'year is required'}), 400
+    sheet = get_all_files_sheets(year)
     data = sheet["data"]
     headers = sheet["headers"]
 

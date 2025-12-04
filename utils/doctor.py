@@ -76,4 +76,4 @@ def filter_datas(req, data:list):
     admit_end_dt = safe_parse_data(_pick('入院日期_end')) if _pick('入院日期_end') else None
     discharge_start_dt = safe_parse_data(_pick('出院日期_start')) if _pick('出院日期_start') else None
     discharge_end_dt = safe_parse_data(_pick('出院日期_end')) if _pick('出院日期_end') else None
-    return [row for row in data if filter_datas(req, row, admit_start_dt, admit_end_dt, discharge_start_dt, discharge_end_dt)]
+    return [row for row in data if match_row(row, admit_start_dt, admit_end_dt, discharge_start_dt, discharge_end_dt)]

@@ -94,32 +94,9 @@ def load_sheets(sheets: List[SheetSpec]):
         "data": data_all,
     }
 
-_ALL_FILES_CACHE = None
-_ALL_FILES_CACHE_SIGNATURE = None
+_ALL_FILES_CACHE = {}
 
-def _files_signature(base: str = './files/2022'):
-    if not os.path.isdir(base):
-        return ()
-    items = []
-    # 递归遍历目录
-    for root, _, files in os.walk(base):
-        for name in files:
-            if not name.lower().endswith('.xlsx'):
-                continue
-            if name.startswith('~'):
-                continue
-            p = os.path.join(root, name)
-            try:
-                m = os.path.getmtime(p)  # 获取文件的最后修改时间戳
-            except Exception:
-                m = 0
-            # 保存相对路径，保持排序一致性
-            rel_path = os.path.relpath(p, base)
-            items.append((rel_path, m))
-    items.sort()
-    return tuple(items)
-
-def list_excel_files(base: str = './files/2022') -> List[SheetSpec]:
+def list_excel_files(base: str) -> List[SheetSpec]:
     res: List[SheetSpec] = []
     if os.path.isdir(base):
         # 递归遍历目录
@@ -134,17 +111,14 @@ def list_excel_files(base: str = './files/2022') -> List[SheetSpec]:
                 res.append({"path": os.path.join(base, rel_path)})
     return res
 
-def get_all_files_sheets(base: str = './files/2022'):
-    global _ALL_FILES_CACHE, _ALL_FILES_CACHE_SIGNATURE
-    sig = _files_signature(base) 
-    if _ALL_FILES_CACHE is None or _ALL_FILES_CACHE_SIGNATURE != sig:
-        sheets = list_excel_files(base)
-        if not sheets:
-            _ALL_FILES_CACHE = {"headers": [], "data": []}
-        else:
-            _ALL_FILES_CACHE = load_sheets(sheets)
-        _ALL_FILES_CACHE_SIGNATURE = sig
-    return _ALL_FILES_CACHE
+def get_all_files_sheets(year: int | str | None = None, base: str = './files'):
+    global _ALL_FILES_CACHE
+    base_path = os.path.join(base, str(year)) if year is not None else base
+    key = os.path.abspath(base_path)
+    if key not in _ALL_FILES_CACHE:
+        sheets = list_excel_files(base_path)
+        _ALL_FILES_CACHE[key] = {"headers": [], "data": []} if not sheets else load_sheets(sheets)
+    return _ALL_FILES_CACHE[key]
 
 def get_diagnosis_names(name: str):
     sheet = load_sheet("./back/0妇科-重点专业单病种质控指标.xlsx", 1)

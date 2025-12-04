@@ -8,6 +8,16 @@
 </head>
 <body>
   <h1 class="page-title">科室总览</h1>
+  <div style="padding:0 16px 8px 16px; display:flex; align-items:center; gap:8px;">
+    <label for="year-select" style="color:#6b7280;">年份</label>
+    <select id="year-select" style="border:1px solid #e5e7eb; border-radius:6px; padding:6px 8px;">
+      <option value="">请选择年份</option>
+      <option value="2022">2022</option>
+      <option value="2023">2023</option>
+      <option value="2024">2024</option>
+      <option value="2025">2025</option>
+    </select>
+  </div>
   <div id="app"></div>
 </body>
 <script src="https://unpkg.com/dayjs@1.11.11/dayjs.min.js"></script>
