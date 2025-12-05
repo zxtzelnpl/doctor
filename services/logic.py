@@ -23,7 +23,12 @@ def get_indicator_detail(params: Dict[str, Any]) -> Dict[str, Any] | None:
     discharge_start_dt = params['discharge_start_dt']
     discharge_end_dt = params['discharge_end_dt']
 
-    filtered_data = filter_by_datas(result, admit_start_dt, admit_end_dt, discharge_start_dt, discharge_end_dt)
+    filtered_data = filter_by_datas(result, {
+        'admit_start_dt': admit_start_dt,
+        'admit_end_dt': admit_end_dt,
+        'discharge_start_dt': discharge_start_dt,
+        'discharge_end_dt': discharge_end_dt,
+    })
     filtered_data = filter_by_department(filtered_data, department)
 
     return None if filtered_data is None else {"headers": headers, "data": filtered_data}
