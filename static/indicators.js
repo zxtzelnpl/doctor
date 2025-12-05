@@ -17,12 +17,16 @@ function updateParamsToSearch() {
     "出院日期_end"
   ];
   const params = getParamsFromSearch();
-  names.forEach(n => {
-    const el = form.querySelector(`[name="${n}"]`);
-    console.log('el', el.value);
-    if (el && String(el.value || "").trim() !== "") params[n] = el.value;
+  names.forEach(name => {
+    const el = form.querySelector(`[name="${name}"]`);
+
+    if (el && String(el.value || "").trim() !== "") {
+      params[name] = el.value
+    } else {
+      delete params[name];
+    }
   });
-  console.log('params', params);
+
   const q = toQuery(params);
   const url = `${location.pathname}${q ? `?${q}` : ""}`;
   history.replaceState(null, "", url);
