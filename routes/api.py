@@ -12,19 +12,24 @@ from constants.departments import departmentsByYear
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
+# 获取部门信息：根据年份返回对应科室列表
+# 若年份在 departmentsByYear 配置中存在，直接返回配置；否则读取 Excel 数据动态提取
 @api_bp.post('/department/list')
 def get_departments_list():
     data_in = request.get_json(silent=True) or {}
-    year = data_in.get('year') or request.args.get('year')
+    year =data_in.get('year') or request.args.get('year')
+    print(year)
     if not year:
         return jsonify({'error': 'year is required'}), 400
     
     if year in departmentsByYear:
+        print(departmentsByYear[year])
         return jsonify({'departments': departmentsByYear[year]})
+    else:
+        all_data = get_all_files_sheets(year)
+        return jsonify({'departments': get_all_departments(all_data["data"])})
 
-    all_data = get_all_files_sheets(year)
-    return jsonify({'departments': get_all_departments(all_data["data"])})
-
+# 获取指标信息：根据年份和科室返回指标列表
 @api_bp.post('/indicators')
 def get_indicators_api():
     data_in = request.get_json(silent=True) or {}
