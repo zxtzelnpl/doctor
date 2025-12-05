@@ -72,10 +72,14 @@ function buildRow(ind, params) {
   const downloadUrl = `/api/indicator/export?${toQuery(detailParams)}`;
   const btnDetail = document.createElement("a");
   btnDetail.href = detailUrl;
+  btnDetail.target = "_blank";
+  btnDetail.rel = "noopener noreferrer";
   btnDetail.textContent = "详情";
   btnDetail.className = "inline-block px-2 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700";
   const btnDownload = document.createElement("a");
   btnDownload.href = downloadUrl;
+  btnDownload.target = "_blank";
+  btnDownload.rel = "noopener noreferrer";
   btnDownload.textContent = "下载";
   btnDownload.className = "inline-block px-2 py-1 rounded bg-gray-600 text-white hover:bg-gray-700";
   const btnLoad = document.createElement("button");

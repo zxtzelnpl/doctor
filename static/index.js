@@ -43,7 +43,7 @@ const renderCards = (root, departments, year) => {
       const u = new URL('/indicators', window.location.origin);
       u.searchParams.set('出院科室', name);
       if (year) u.searchParams.set('year', year);
-      window.location.href = u.toString();
+      window.open(u.toString(), '_blank');
     };
     grid.appendChild(card);
   }
