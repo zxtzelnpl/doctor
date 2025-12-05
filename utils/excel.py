@@ -77,11 +77,23 @@ class SheetSpec(TypedDict):
     number: NotRequired[int]
 
 def load_sheets(sheets: List[SheetSpec]):
+    from concurrent.futures import ThreadPoolExecutor
     headers_all = []
     seen = set()
     data_all = []
-    for sheet in sheets:
-        result = load_sheet(sheet["path"], sheet.get("number", 0))
+    max_workers = min(len(sheets) or 1, max(1, (os.cpu_count() or 4)))
+    work_items = [{"path": os.path.abspath(s["path"]), "number": s.get("number", 0)} for s in sheets]
+    def _task(spec: SheetSpec):
+        return load_sheet(spec["path"], spec.get("number", 0))
+    with ThreadPoolExecutor(max_workers=max_workers) as ex:
+        futures = [ex.submit(_task, s) for s in work_items]
+        results = []
+        for fut in futures:
+            try:
+                results.append(fut.result())
+            except Exception:
+                results.append({"headers": [], "data": []})
+    for result in results:
         headers = result["headers"]
         data = result["data"]
         for h in headers:
@@ -93,8 +105,6 @@ def load_sheets(sheets: List[SheetSpec]):
         "headers": headers_all,
         "data": data_all,
     }
-
-_ALL_FILES_CACHE = {}
 
 def list_excel_files(base: str) -> List[SheetSpec]:
     res: List[SheetSpec] = []
@@ -111,14 +121,10 @@ def list_excel_files(base: str) -> List[SheetSpec]:
                 res.append({"path": os.path.join(base, rel_path)})
     return res
 
-def get_all_files_sheets(year: int | str | None = None, base: str = './files'):
-    global _ALL_FILES_CACHE
-    base_path = os.path.join(base, str(year)) if year is not None else base
-    key = os.path.abspath(base_path)
-    if key not in _ALL_FILES_CACHE:
-        sheets = list_excel_files(base_path)
-        _ALL_FILES_CACHE[key] = {"headers": [], "data": []} if not sheets else load_sheets(sheets)
-    return _ALL_FILES_CACHE[key]
+def get_all_files_sheets(year: int | str, base: str = './files'):
+    base_path = os.path.join(base, str(year))
+    sheets = list_excel_files(base_path)
+    return load_sheets(sheets)
 
 def get_diagnosis_names(name: str):
     sheet = load_sheet("./back/0妇科-重点专业单病种质控指标.xlsx", 1)

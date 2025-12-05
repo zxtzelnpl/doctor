@@ -1,3 +1,4 @@
+from utils.json import get_all_files_jsons
 from utils.excel import get_all_departments
 from flask import request
 from flask import Blueprint, jsonify, send_file
@@ -6,9 +7,6 @@ from services.logic import get_department_indicators
 from utils.excel import export_sheet
 from utils.excel import get_all_files_sheets
 from utils.doctor import filter_datas
-from constants.departments import departmentsByYear
-
-
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -21,12 +19,10 @@ def get_departments_list():
     print(year)
     if not year:
         return jsonify({'error': 'year is required'}), 400
-    
-    if year in departmentsByYear:
-        print(departmentsByYear[year])
-        return jsonify({'departments': departmentsByYear[year]})
+    # if year in departmentsByYear:
+    #     return jsonify({'departments': departmentsByYear[year]})
     else:
-        all_data = get_all_files_sheets(year)
+        all_data = get_all_files_jsons(year)
         return jsonify({'departments': get_all_departments(all_data["data"])})
 
 # 获取指标信息：根据年份和科室返回指标列表
