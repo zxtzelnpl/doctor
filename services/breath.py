@@ -22,3 +22,6 @@ def get_indicators():
         '曾行有创机械通气的住院患者死亡数',
         '同期曾行有创机械通气的住院患者总人次数',
     ]
+
+def get_breath_indicator_detail(data: list, indicator: str) :
+    return data

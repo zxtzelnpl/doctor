@@ -1,19 +1,21 @@
+from utils.doctor import filter_by_department
+from utils.doctor import filter_by_datas
+from utils.base import safe_parse_data
 from utils.json import get_all_files_jsons
 from utils.excel import get_all_departments
 from flask import request
 from flask import Blueprint, jsonify, send_file
-from services.logic import get_indicator_value
+from services.logic import get_indicator_detail
 from services.logic import get_department_indicators
 from utils.excel import export_sheet
 from utils.excel import get_all_files_sheets
-from utils.doctor import filter_datas
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 # 获取部门信息：根据年份返回对应科室列表
 # 若年份在 departmentsByYear 配置中存在，直接返回配置；否则读取 Excel 数据动态提取
 @api_bp.post('/department/list')
-def get_departments_list():
+def get_department_list():
     data_in = request.get_json(silent=True) or {}
     year =data_in.get('year') or request.args.get('year')
     print(year)
@@ -23,11 +25,12 @@ def get_departments_list():
     #     return jsonify({'departments': departmentsByYear[year]})
     else:
         all_data = get_all_files_jsons(year)
-        return jsonify({'departments': get_all_departments(all_data["data"])})
+        departments = sorted(get_all_departments(all_data["data"]))
+        return jsonify({'departments': departments})
 
 # 获取指标信息：根据年份和科室返回指标列表
 @api_bp.post('/indicators')
-def get_indicators_api():
+def get_indicators():
     data_in = request.get_json(silent=True) or {}
     year = data_in.get('year') or request.args.get('year')
     department = data_in.get('department') or request.args.get('department') or data_in.get('出院科室') or request.args.get('出院科室')
@@ -36,31 +39,67 @@ def get_indicators_api():
     indicators = get_department_indicators(str(year), str(department))
     return jsonify({'indicators': indicators})
 
-@api_bp.post('/indicator/list')
-def get_indicator_list():
-    data_in = request.get_json(silent=True) or {}
-    indicator = data_in.get('indicator') or request.args.get('indicator')
-    if not indicator:
-        return jsonify({'error': 'indicator is required'}), 400
-    value = get_indicator_value(indicator)
-    if not value or not isinstance(value.get('data'), list):
-        return jsonify({'indicator': indicator, 'value': value})
-  
-    filtered = filter_datas(request, value['data'])
-    return jsonify({'indicator': indicator, 'value': {'headers': value['headers'], 'data': filtered}})
+@api_bp.post('/indicator/detail')
+def indicator_detail():
+    data_json = request.get_json(silent=True) or {}
+    args = getattr(request, 'args', {}) or {}
+    def _pick(k):
+        v = data_json.get(k)
+        return v if v not in (None, '') else args.get(k)
+
+    indicator = _pick('indicator')
+    year = _pick('year')
+    department = _pick('出院科室')
+    admit_start_dt = safe_parse_data(_pick('入院日期_start'))
+    admit_end_dt = safe_parse_data(_pick('入院日期_end'))
+    discharge_start_dt = safe_parse_data(_pick('出院日期_start'))
+    discharge_end_dt = safe_parse_data(_pick('出院日期_end'))
+
+    if not indicator or not year or not department:
+        return jsonify({'error': 'indicator, year, and department are required'}), 400
+    
+    value = get_indicator_detail({
+        'year': str(year), 
+        'department': department, 
+        'indicator': indicator,
+        'admit_start_dt': admit_start_dt,
+        'admit_end_dt': admit_end_dt,
+        'discharge_start_dt': discharge_start_dt,
+        'discharge_end_dt': discharge_end_dt
+    })
+
+    return jsonify({'indicator': indicator, 'value': value})
 
 @api_bp.get('/indicator/export')
 def export_indicator():
-    indicator = request.args.get('indicator')
-    if not indicator:
-        return jsonify({'error': 'indicator is required'}), 400
-    value = get_indicator_value(indicator)
-    if not value or not isinstance(value.get('data'), list):
-        return jsonify({'error': 'no data for indicator'}), 404
+    data_json = request.get_json(silent=True) or {}
+    args = getattr(request, 'args', {}) or {}
+    def _pick(k):
+        v = data_json.get(k)
+        return v if v not in (None, '') else args.get(k)
 
-    filtered = filter_datas(request, value['data'])
+    indicator = _pick('indicator')
+    year = _pick('year')
+    department = _pick('出院科室')
+    admit_start_dt = safe_parse_data(_pick('入院日期_start'))
+    admit_end_dt = safe_parse_data(_pick('入院日期_end'))
+    discharge_start_dt = safe_parse_data(_pick('出院日期_start'))
+    discharge_end_dt = safe_parse_data(_pick('出院日期_end'))
 
-    res = export_sheet(f"{indicator}明细", value['headers'], filtered)
+    if not indicator or not year or not department:
+        return jsonify({'error': 'indicator, year, and department are required'}), 400
+    
+    value = get_indicator_detail({
+        'year': str(year), 
+        'department': department, 
+        'indicator': indicator,
+        'admit_start_dt': admit_start_dt,
+        'admit_end_dt': admit_end_dt,
+        'discharge_start_dt': discharge_start_dt,
+        'discharge_end_dt': discharge_end_dt
+    })
+
+    res = export_sheet(f"{year}{indicator}明细", value['headers'], value['data'])
     return send_file(
         res['output'],
         as_attachment=True,
@@ -70,13 +109,27 @@ def export_indicator():
 
 @api_bp.post('/details')
 def get_details():
-    data_in = request.get_json(silent=True) or {}
-    year = data_in.get('year') or request.args.get('year')
-    if not year:
-        return jsonify({'error': 'year is required'}), 400
-    sheet = get_all_files_sheets(year)
-    data = sheet["data"]
-    headers = sheet["headers"]
+    data_json = request.get_json(silent=True) or {}
+    args = getattr(request, 'args', {}) or {}
+    def _pick(k):
+        v = data_json.get(k)
+        return v if v not in (None, '') else args.get(k)
 
-    filtered = filter_datas(request, data)
-    return jsonify({"headers": headers, "data": filtered})
+    year = _pick('year')
+    department = _pick('出院科室')
+    admit_start_dt = safe_parse_data(_pick('入院日期_start'))
+    admit_end_dt = safe_parse_data(_pick('入院日期_end'))
+    discharge_start_dt = safe_parse_data(_pick('出院日期_start'))
+    discharge_end_dt = safe_parse_data(_pick('出院日期_end'))
+
+    all_data = get_all_files_jsons(year)
+
+    data_filter_by_department = filter_by_department(all_data["data"], department)
+    result = filter_by_datas(data_filter_by_department, {
+        'admit_start_dt': admit_start_dt,
+        'admit_end_dt': admit_end_dt,
+        'discharge_start_dt': discharge_start_dt,
+        'discharge_end_dt': discharge_end_dt,
+    })
+
+    return jsonify({"headers": result['headers'], "data": result['data']})

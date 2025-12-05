@@ -125,15 +125,3 @@ def get_all_files_sheets(year: int | str, base: str = './files'):
     base_path = os.path.join(base, str(year))
     sheets = list_excel_files(base_path)
     return load_sheets(sheets)
-
-def get_diagnosis_names(name: str):
-    sheet = load_sheet("./back/0妇科-重点专业单病种质控指标.xlsx", 1)
-    data = sheet["data"]
-    # 筛选「字典名称」为‘异位妊娠’的数据，取「名称」字段放入列表
-    filter_item = [
-        item for item in data
-        if str(item.get('字典名称')) == name
-    ]
-    names = [item['名称'] for item in filter_item]
-    
-    return names

@@ -30,7 +30,7 @@ const applyParamsToForm = (form, params) => {
 };
 
 const fetchIndicatorValue = async (indicator, year, department) => {
-  const res = await fetch('/api/indicator/list', {
+  const res = await fetch('/api/indicator/detail', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ indicator, year, department })

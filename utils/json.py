@@ -69,7 +69,7 @@ def list_json_files(base: str) -> List[JsonSpec]:
                 res.append({"path": os.path.join(base, rel_path)})
     return res
 
-def get_all_files_jsons(year: int | str | None = None, base: str = './files'):
-    base_path = os.path.join(base, str(year)) if year is not None else base
+def get_all_files_jsons(year: str):
+    base_path = os.path.join('./files', year)
     sheets = list_json_files(base_path)        
     return load_jsons(sheets)
