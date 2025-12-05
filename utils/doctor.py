@@ -1,3 +1,6 @@
+from constants.header import ADMIT_TIME_HEADER
+from constants.header import DISCHARGE_TIME_HEADER
+from constants.header import DEPARTMENT_HEADER
 from typing import Dict
 from typing import Any
 from datetime import datetime
@@ -16,11 +19,11 @@ def match_admission_date(row, start_dt=None, end_dt=None):
     """
     if not (start_dt or end_dt):
         return True
-    rv = row.get('入院日期')
+    rv = row.get(ADMIT_TIME_HEADER)
     if not rv:
         return False
     try:
-        rdt = datetime.strptime(str(rv), '%Y-%m-%d')
+        rdt = datetime.strptime(str(rv), '%Y-%m-%d %H:%M:%S')
     except Exception:
         return False
     if start_dt and rdt < start_dt:
@@ -43,11 +46,11 @@ def match_discharge_date(row, start_dt=None, end_dt=None):
     """
     if not (start_dt or end_dt):
         return True
-    rv = row.get('出院日期')
+    rv = row.get(DISCHARGE_TIME_HEADER)
     if not rv:
         return False
     try:
-        rdt = datetime.strptime(str(rv), '%Y-%m-%d')
+        rdt = datetime.strptime(str(rv), '%Y-%m-%d %H:%M:%S')
     except Exception:
         return False
     if start_dt and rdt < start_dt:
@@ -72,11 +75,11 @@ def filter_by_datas(data:list, params: Dict[str, Any]):
     admit_end_dt = params['admit_end_dt']
     discharge_start_dt = params['discharge_start_dt']
     discharge_end_dt = params['discharge_end_dt']
- 
+  
     return [
         row for row in data 
         if match_admission_date(row, admit_start_dt, admit_end_dt) and match_discharge_date(row, discharge_start_dt, discharge_end_dt)
     ]
 
 def filter_by_department(data: list, department: str):
-    return [item for item in data if department in str(item.get('出院科室', ''))]
+    return [item for item in data if department in str(item.get(DEPARTMENT_HEADER, ''))]

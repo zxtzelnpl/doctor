@@ -2,13 +2,11 @@ from utils.doctor import filter_by_department
 from utils.doctor import filter_by_datas
 from utils.base import safe_parse_data
 from utils.json import get_all_files_jsons
-from utils.excel import get_all_departments
 from flask import request
 from flask import Blueprint, jsonify, send_file
-from services.logic import get_indicator_detail
+from services.logic import get_all_departments, get_indicator_detail
 from services.logic import get_department_indicators
 from utils.excel import export_sheet
-from utils.excel import get_all_files_sheets
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 

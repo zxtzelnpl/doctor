@@ -73,3 +73,4 @@ departmentsByYear = {
         "十二病区"
     ]
 }
+

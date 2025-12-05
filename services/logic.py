@@ -3,6 +3,25 @@ from services.breath import get_breath_indicator_detail, get_indicators as get_b
 from utils.json import get_all_files_jsons
 from typing import Dict, Any
 
+from constants.header import DEPARTMENT_HEADER
+
+def get_all_departments(data: list):
+    header = DEPARTMENT_HEADER
+    # 收集所有非空的入院病房值
+    departments = [
+        str(item[header])
+        for item in data
+        if header in item and item[header] is not None and str(item[header]).strip() != ''
+    ]
+    # 去重并保持原顺序
+    seen = set()
+    unique_departments = []
+    for dept in departments:
+        if dept not in seen:
+            seen.add(dept)
+            unique_departments.append(dept)
+    return unique_departments
+
 def get_indicator_detail(params: Dict[str, Any]) -> Dict[str, Any] | None:
     year = params['year']
     indicator = params['indicator']
@@ -30,6 +49,7 @@ def get_indicator_detail(params: Dict[str, Any]) -> Dict[str, Any] | None:
         'discharge_end_dt': discharge_end_dt,
     })
     filtered_data = filter_by_department(filtered_data, department)
+
 
     return None if filtered_data is None else {"headers": headers, "data": filtered_data}
 

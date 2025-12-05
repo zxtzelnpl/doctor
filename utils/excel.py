@@ -55,23 +55,6 @@ def export_sheet(title: str, headers: list, data: list):
         "output": output,
     }
 
-def get_all_departments(data: list):
-    header = '出院病房(CYBF)'
-    # 收集所有非空的入院病房值
-    departments = [
-        str(item[header])
-        for item in data
-        if header in item and item[header] is not None and str(item[header]).strip() != ''
-    ]
-    # 去重并保持原顺序
-    seen = set()
-    unique_departments = []
-    for dept in departments:
-        if dept not in seen:
-            seen.add(dept)
-            unique_departments.append(dept)
-    return unique_departments
-
 class SheetSpec(TypedDict):
     path: str
     number: NotRequired[int]
