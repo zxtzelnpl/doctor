@@ -1,12 +1,34 @@
+function getParamsFromSearch() {
+  const qs = new URLSearchParams(window.location.search);
+  const initParams = {};
+  qs.forEach((v, k) => {
+    if (v !== undefined && v !== null && String(v).trim() !== "") initParams[k] = v;
+  });
 
-const fetchData = async (indicator) => {
+  return initParams;
+}
+
+function toQuery(params) {
+  const usp = new URLSearchParams();
+  Object.keys(params).forEach(k => {
+    if (params[k] !== undefined && params[k] !== null) usp.set(k, params[k]);
+  });
+  return usp.toString();
+}
+
+
+const fetchData = async () => {
+  const params = getParamsFromSearch();
+  const indicator = params.indicator;
+  if (!indicator) return;
+
   try {
-    const response = await fetch('/api/get_indicator_data', {
+    const response = await fetch('/api/indicator/detail', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ indicator })
+      body: JSON.stringify(params)
     });
 
     if (!response.ok) {
@@ -22,59 +44,31 @@ const fetchData = async (indicator) => {
 
 const init = async () => {
   // 1. 从浏览器的search参数中获取indicator参数
-  const params = new URLSearchParams(window.location.search);
-  const indicator = params.get('indicator');
+  const params = getParamsFromSearch();
+  const indicator = params['indicator'];
+  const year = params['year'];
+  const department = params['出院科室'];
   if (!indicator) return;
 
   // 2. 在标题处显示indicator参数，并绑定下载按钮
   const indicatorEl = document.getElementById('indicator');
   if (indicatorEl) indicatorEl.textContent = indicator;
+  const yearEl = document.getElementById('year');
+  if (yearEl) yearEl.textContent = year;
+  const departmentEl = document.getElementById('department');
+  if (departmentEl) departmentEl.textContent = department;
   const downloadBtn = document.getElementById('download-btn');
   if (downloadBtn) {
     downloadBtn.onclick = () => {
-      const url = `/api/indicator/export?indicator=${encodeURIComponent(indicator)}`;
-      window.location.href = url;
+      const params = getParamsFromSearch();
+      const downloadUrl = `/api/indicator/export?${toQuery(params)}`;
+      window.open(downloadUrl, "_blank");
     };
   }
 
   // 3. 根据indicator参数发起请求，获取数据
-  const value = await fetchData(indicator);
+  const value = await fetchData();
   if (!value || !Array.isArray(value.data)) return;
-  const admitStart = params.get('入院日期_start');
-  const admitEnd = params.get('入院日期_end');
-  const dischargeStart = params.get('出院日期_start');
-  const dischargeEnd = params.get('出院日期_end');
-  const dept = params.get('出院科室');
-  const year = params.get('year');
-  const month = params.get('month');
-  const matchAdmission = (row) => {
-    if (!admitStart && !admitEnd) return true;
-    const v = row['入院日期'];
-    if (!v) return false;
-    const d = dayjs(String(v));
-    if (!d.isValid()) return false;
-    if (admitStart && d.isBefore(dayjs(admitStart))) return false;
-    if (admitEnd && d.isAfter(dayjs(admitEnd))) return false;
-    return true;
-  };
-  const matchDischarge = (row) => {
-    if (!dischargeStart && !dischargeEnd && !year && !month) return true;
-    const v = row['出院日期'];
-    if (!v) return false;
-    const d = dayjs(String(v));
-    if (!d.isValid()) return false;
-    if (dischargeStart && d.isBefore(dayjs(dischargeStart))) return false;
-    if (dischargeEnd && d.isAfter(dayjs(dischargeEnd))) return false;
-    if (year && String(d.year()) !== String(year)) return false;
-    if (month && String(d.month()+1).padStart(2,'0') !== String(month).padStart(2,'0')) return false;
-    return true;
-  };
-  const filteredRows = value.data.filter(r => {
-    if (dept && String(r['出院科室']||'').indexOf(dept) === -1) return false;
-    if (!matchAdmission(r)) return false;
-    if (!matchDischarge(r)) return false;
-    return true;
-  });
 
   // 4. 将data渲染到对应的表格中，表格的header为data每一行数据的key
   const detailsEl = document.getElementById('details');
@@ -99,7 +93,7 @@ const init = async () => {
 
   // 表体
   const tbody = document.createElement('tbody');
-  filteredRows.forEach(row => {
+  value.data.forEach(row => {
     const tr = document.createElement('tr');
     tr.className = 'odd:bg-white even:bg-gray-50';
     headers.forEach(key => {
