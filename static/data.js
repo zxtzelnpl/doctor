@@ -36,7 +36,7 @@ const fetchData = async () => {
     }
 
     const data = await response.json();
-    return data.value;
+    return data;
   } catch (error) {
     console.error('获取数据出错:', error);
   }
@@ -67,14 +67,18 @@ const init = async () => {
   }
 
   // 3. 根据indicator参数发起请求，获取数据
-  const value = await fetchData();
-  if (!value || !Array.isArray(value.data)) return;
+  const reslut = await fetchData();
+  if(!reslut) return;
+  const sheet = reslut.sheet;
+  if (!sheet) return;
 
   // 4. 将data渲染到对应的表格中，表格的header为data每一行数据的key
   const detailsEl = document.getElementById('details');
   if (!detailsEl) return;
 
-  const headers = Array.isArray(value.headers) ? value.headers : [];
+
+  const headers = Array.isArray(sheet.headers) ? sheet.headers : [];
+  const rows = Array.isArray(sheet.data) ? sheet.data : [];
   const table = document.createElement('table');
   table.className = 'min-w-full table-auto border-collapse';
 
@@ -93,7 +97,7 @@ const init = async () => {
 
   // 表体
   const tbody = document.createElement('tbody');
-  value.data.forEach(row => {
+  rows.forEach(row => {
     const tr = document.createElement('tr');
     tr.className = 'odd:bg-white even:bg-gray-50';
     headers.forEach(key => {

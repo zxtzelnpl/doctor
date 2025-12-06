@@ -116,7 +116,8 @@ function buildRow(name) {
       });
       if (!res.ok) throw new Error("加载明细失败");
       const data = await res.json(); 
-      tdValue.innerHTML = data?.value?.data?.length || '--';
+      const value = data?.value ?? '--';
+      tdValue.innerHTML = value;
     } catch (e) {
       tdValue.textContent = String(e.message || e);
     } finally {

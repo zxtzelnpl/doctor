@@ -1,5 +1,3 @@
-from utils.doctor import filter_by_department
-from utils.doctor import filter_by_datas
 from utils.base import safe_parse_data
 from utils.json import get_all_files_jsons
 from flask import request
@@ -56,7 +54,7 @@ def indicator_detail():
     if not indicator or not year or not department:
         return jsonify({'error': 'indicator, year, and department are required'}), 400
     
-    value = get_indicator_detail({
+    result = get_indicator_detail({
         'year': str(year), 
         'department': department, 
         'indicator': indicator,
@@ -66,7 +64,7 @@ def indicator_detail():
         'discharge_end_dt': discharge_end_dt
     })
 
-    return jsonify({'indicator': indicator, 'value': value})
+    return jsonify({'indicator': indicator, 'value': result['value'], 'sheet': result['sheet']})
 
 @api_bp.get('/indicator/export')
 def export_indicator():
@@ -104,30 +102,3 @@ def export_indicator():
         download_name=res['filename'],
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
-
-@api_bp.post('/details')
-def get_details():
-    data_json = request.get_json(silent=True) or {}
-    args = getattr(request, 'args', {}) or {}
-    def _pick(k):
-        v = data_json.get(k)
-        return v if v not in (None, '') else args.get(k)
-
-    year = _pick('year')
-    department = _pick('出院科室')
-    admit_start_dt = safe_parse_data(_pick('入院日期_start'))
-    admit_end_dt = safe_parse_data(_pick('入院日期_end'))
-    discharge_start_dt = safe_parse_data(_pick('出院日期_start'))
-    discharge_end_dt = safe_parse_data(_pick('出院日期_end'))
-
-    all_data = get_all_files_jsons(year)
-
-    data_filter_by_department = filter_by_department(all_data["data"], department)
-    result = filter_by_datas(data_filter_by_department, {
-        'admit_start_dt': admit_start_dt,
-        'admit_end_dt': admit_end_dt,
-        'discharge_start_dt': discharge_start_dt,
-        'discharge_end_dt': discharge_end_dt,
-    })
-
-    return jsonify({"headers": result['headers'], "data": result['data']})
