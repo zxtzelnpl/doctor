@@ -47,7 +47,7 @@ const init = async () => {
   const params = getParamsFromSearch();
   const indicator = params['indicator'];
   const year = params['year'];
-  const department = params['出院科室'];
+  const department = params['department'];
   if (!indicator) return;
 
   // 2. 在标题处显示indicator参数，并绑定下载按钮

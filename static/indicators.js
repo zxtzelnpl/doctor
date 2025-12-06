@@ -42,14 +42,14 @@ function toQuery(params) {
 
 async function fetchIndicators() {
   const p = getParamsFromSearch();
-  const department = p["出院科室"]
+  const department = p["department"]
   const year = p["year"]
 
   const res = await fetch(`/api/indicators`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      出院科室: department,
+      department: department,
       year: year
     })
   });
@@ -179,5 +179,5 @@ window.addEventListener("DOMContentLoaded", () => {
   const applyBtn = document.getElementById("apply-btn");
   applyBtn.addEventListener("click", () => updateParamsToSearch());
 
-  renderTable(initParams['出院科室'])
+  renderTable()
 });

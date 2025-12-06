@@ -41,7 +41,7 @@ const renderCards = (root, departments, year) => {
     card.appendChild(title);
     card.onclick = () => {
       const u = new URL('/indicators', window.location.origin);
-      u.searchParams.set('出院科室', name);
+      u.searchParams.set('department', name);
       if (year) u.searchParams.set('year', year);
       window.open(u.toString(), '_blank');
     };
@@ -70,6 +70,22 @@ const init = async () => {
     await load();
   };
   await load();
+
+  const depLinks = document.getElementById('departments').querySelectorAll('a');
+  depLinks.forEach(link => {
+    link.onclick = (e) => {
+      e.preventDefault();
+      const y = yearSelect.value;
+      const d = link.textContent.trim();
+      if (y) {
+        
+        const u = new URL('/indicators', window.location.origin);
+        u.searchParams.set('year', y);
+        u.searchParams.set('department', d);
+        window.open(u.toString(), '_blank');
+      }
+    };
+  });
 };
 
 init();

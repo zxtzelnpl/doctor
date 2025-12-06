@@ -5,19 +5,10 @@ from constants.header import (
 from utils.doctor import discharge_plan_in_31_days, get_diagnosis_codes, has_invasive_mechanical_ventilation_treatment, intensive_care_is_empty, intensive_care_is_not_empty, match_surgery_operation, out_from_breath, match_diagnosis, no_admit_diagnosis, not_dead, is_dead
 
 def is_breath_department(year: str, department: str):
-        if(year == '2025'):
-            if(department == '内科一病区（呼吸）'):
-                return True
-        if(year == '2024'):
-            if(department == '内科一病区（呼吸）'):
-                return True
-        if(year == '2023'):
-            if('呼吸' in department):
-                return True
-        if(year == '2022'):
-            if('呼吸' in department):
-                return True
-        return False
+    if('呼吸' in department):
+        return True
+    return False
+
 
 def get_indicators():
     return [

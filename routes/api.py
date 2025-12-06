@@ -29,7 +29,7 @@ def get_department_list():
 def get_indicators():
     data_in = request.get_json(silent=True) or {}
     year = data_in.get('year') or request.args.get('year')
-    department = data_in.get('department') or request.args.get('department') or data_in.get('出院科室') or request.args.get('出院科室')
+    department = data_in.get('department') or request.args.get('department')
     if not year or not department:
         return jsonify({'error': 'year and department are required'}), 400
     indicators = get_department_indicators(str(year), str(department))
@@ -45,7 +45,7 @@ def indicator_detail():
 
     indicator = _pick('indicator')
     year = _pick('year')
-    department = _pick('出院科室')
+    department = _pick('department')
     admit_start_dt = safe_parse_data(_pick('入院日期_start'))
     admit_end_dt = safe_parse_data(_pick('入院日期_end'))
     discharge_start_dt = safe_parse_data(_pick('出院日期_start'))
@@ -76,7 +76,7 @@ def export_indicator():
 
     indicator = _pick('indicator')
     year = _pick('year')
-    department = _pick('出院科室')
+    department = _pick('department')
     admit_start_dt = safe_parse_data(_pick('入院日期_start'))
     admit_end_dt = safe_parse_data(_pick('入院日期_end'))
     discharge_start_dt = safe_parse_data(_pick('出院日期_start'))
