@@ -71,7 +71,7 @@ const init = async () => {
   };
   await load();
 
-  const depLinks = document.getElementById('departments').querySelectorAll('a');
+  const depLinks = document.getElementById('departments').querySelectorAll('.card');
   depLinks.forEach(link => {
     link.onclick = (e) => {
       e.preventDefault();
