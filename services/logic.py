@@ -1,7 +1,14 @@
-from services.breath import get_breath_indicator_detail, get_indicators as get_breath_indicators
+from services.breath import (
+    get_breath_indicator_detail,
+    get_indicators as get_breath_indicators,
+    is_breath_department
+)
 from utils.json import get_all_files_jsons
 from typing import Dict, Any
-from services.breath import is_breath_department
+from services.neurology import (
+    get_indicators as get_neurology_indicators,   
+    is_neurology_department
+)
 from constants.header import ADMIT_WARD_HEADER
 
 def get_all_departments(data: list):
@@ -24,6 +31,9 @@ def get_all_departments(data: list):
 def get_department_indicators(year: str, department: str):
     if(is_breath_department(year, department)):
         return get_breath_indicators()
+    elif(is_neurology_department(year, department)):
+        return get_neurology_indicators()
+    
     return [
         'test'
     ]
