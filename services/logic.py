@@ -6,7 +6,8 @@ from services.breath import (
 from utils.json import get_all_files_jsons
 from typing import Dict, Any
 from services.neurology import (
-    get_indicators as get_neurology_indicators,   
+    get_indicators as get_neurology_indicators,
+    get_neurology_indicator_detail,   
     is_neurology_department
 )
 from constants.header import ADMIT_WARD_HEADER
@@ -47,8 +48,10 @@ def get_indicator_detail(params: Dict[str, Any]) -> Dict[str, Any] | None:
     data = sheet["data"]
     if(is_breath_department(year, department)):
         result = get_breath_indicator_detail(data, indicator)
+    elif(is_neurology_department(year, department)):
+        result = get_neurology_indicator_detail(data, indicator)
     else:
-        result = data
+        result = None
 
     # 时间范围筛选
     # admit_start_dt = params['admit_start_dt']
