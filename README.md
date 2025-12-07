@@ -28,6 +28,7 @@ GRANT ALL PRIVILEGES ON DATABASE exampledb TO dbuser;
 #### 激活
 ```bash
 $ source .venv/bin/activate  # Linux 或 macOS
+.venv\Scripts\activate  # Windows
 ```
 
 #### 退出
