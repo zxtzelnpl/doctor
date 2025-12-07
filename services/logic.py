@@ -3,6 +3,11 @@ from services.breath import (
     get_indicators as get_breath_indicators,
     is_breath_department
 )
+from services.endocrinology import (
+    get_endocrinology_indicator_detail,
+    get_indicators as get_endocrinology_indicators,
+    is_endocrinology_department
+)
 from utils.json import get_all_files_jsons
 from typing import Dict, Any
 from services.neurology import (
@@ -34,7 +39,8 @@ def get_department_indicators(year: str, department: str):
         return get_breath_indicators()
     elif(is_neurology_department(year, department)):
         return get_neurology_indicators()
-    
+    elif(is_endocrinology_department(year, department)):
+        return get_endocrinology_indicators()
     return [
         'test'
     ]
@@ -50,6 +56,8 @@ def get_indicator_detail(params: Dict[str, Any]) -> Dict[str, Any] | None:
         result = get_breath_indicator_detail(data, indicator)
     elif(is_neurology_department(year, department)):
         result = get_neurology_indicator_detail(data, indicator)
+    elif(is_endocrinology_department(year, department)):
+        result = get_endocrinology_indicator_detail(data, indicator)
     else:
         result = None
 
