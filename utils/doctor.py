@@ -17,6 +17,12 @@ from utils.excel import load_sheet
 
 from typing import Counter
 
+def out_from_breath(item: dict):
+    return '呼吸' in item.get(DISCHARGE_WARD_HEADER, '')
+
+def out_from_neurology(item: dict):
+    return '神经' in item.get(DISCHARGE_WARD_HEADER, '')
+
 def match_admission_date(row, start_dt=None, end_dt=None):
     """
     根据入院日期筛选记录。
@@ -108,6 +114,9 @@ def match_diagnosis(item: dict, diagnosis_codes: list):
                 item.get(PRIMARY_DIAGNOSIS_HEADER4, ''),
             ])
 
+def not_match_diagnosis(item: dict, diagnosis_codes: list):
+    return not match_diagnosis(item, diagnosis_codes)
+
 def intensive_care_is_empty(item: dict):
     # 当所有字段都不存在（即为空字符串或 None）时返回 True
     return all(
@@ -133,9 +142,6 @@ def intensive_care_is_not_empty(item: dict):
             INTENSIVE_CARE_HEADER5
         ]
     )
-
-def out_from_breath(item: dict):
-    return '呼吸' in item.get(DISCHARGE_WARD_HEADER, '')
 
 def no_admit_diagnosis(item: dict):
     """

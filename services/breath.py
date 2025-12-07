@@ -9,19 +9,6 @@ def is_breath_department(year: str, department: str):
         return True
     return False
 
-
-def get_indicators():
-    return list(BREATH_INDICATOR_FUNC_MAP.keys())
-
-def get_breath_indicator_detail(data: list, indicator: str) :
-    fn = BREATH_INDICATOR_FUNC_MAP.get(indicator)
-    if fn:
-        return fn(data)
-    return {
-        "data": [],
-        "value": 0,
-    }
-
 # 1.病案首页出院科室为呼吸内科
 # 2.病案首页出院主要诊断ICD-10编码：J13至J16，J18；
 # 3.年龄≥18岁且离院方式非死亡的出院患者
@@ -29,7 +16,7 @@ def 社区获得性肺炎出院患者总例数(data: list):
     filtered = [
         item for item in data
         if out_from_breath(item)
-        and (match_diagnosis(item, ['J13', 'J14', 'J15', 'J16', 'J18']))
+        and (match_diagnosis(item, ['J13.', 'J14.', 'J15.', 'J16.', 'J18.']))
         and int(item.get(PRIMARY_AGE_HEADER, 0)) >= 18
         and not_dead(item)
     ]
@@ -55,13 +42,10 @@ def 肺血栓栓塞症出院患者总例数(data: list):
 # 1.病案首页出院科室为呼吸内科
 # 2.病案首页主要诊断ICD-10编码：J44.0，J44.1且离院方式非死亡的出院患者
 def 慢性阻塞性肺疾病出院患者总例数(data: list):
-    # 筛选条件：
-    # 1. 主要诊断编码在ICD-10的J40-J47范围内
-    # 3. 离院方式不为'5'（死亡）
     filtered = [
         item for item in data
         if out_from_breath(item)
-        and (match_diagnosis(item, ['J40', 'J41', 'J42', 'J43', 'J44', 'J45', 'J46', 'J47']))
+        and (match_diagnosis(item, ['J44.0', 'J44.1']))
         and not_dead(item)
     ]
     return {
@@ -69,14 +53,13 @@ def 慢性阻塞性肺疾病出院患者总例数(data: list):
         "value": len(filtered),
     }
 
+# 1.病案首页出院科室为呼吸内科
+# 2.病案首页主要诊断ICD-10编码：J45，J46；年龄 ≥18岁且离院方式非死亡的出院患者
 def 哮喘出院患者总例数(data: list):
-    # 筛选条件：
-    # 1.病案首页出院科室为呼吸内科
-    # 2.病案首页主要诊断ICD-10编码：J45，J46；年龄 ≥18岁且离院方式非死亡的出院患者
     filtered = [
         item for item in data
         if out_from_breath(item)
-        and (match_diagnosis(item, ['J45', 'J46']))
+        and (match_diagnosis(item, ['J45.', 'J46.']))
         and int(item.get(PRIMARY_AGE_HEADER, 0)) >= 18
         and not_dead(item)
     ]
@@ -151,13 +134,10 @@ def 同期监护室住院患者总人次数(data: list):
 # 1、病案首页主要诊断为呼吸内科相关低风险病种的 ICD-10 编码：J04,J06,J20,J21, J40、J45，包括急性喉炎和气管炎、多发性和未特指部位的急性上呼吸道感染、急性支气管炎、急性细支气管炎、支气管炎未特指急性或慢性、哮喘
 # 2、病案首页离院方式为“死亡”的人数
 def 低风险病种住院患者死亡人数(data: list):
-    # 筛选条件：
-    # 1. 主要诊断编码在ICD-10的J04、J06、J20、J21、J40、J45范围内
-    # 2. 离院方式为'5'（死亡）
     filtered = [
         item for item in data
         if out_from_breath(item)
-        and (match_diagnosis(item, ['J04', 'J06', 'J20', 'J21', 'J40', 'J45']))
+        and (match_diagnosis(item, ['J04.', 'J06.', 'J20.', 'J21.', 'J40.', 'J45.']))
         and is_dead(item)
     ]
     return {
@@ -357,3 +337,15 @@ BREATH_INDICATOR_FUNC_MAP = {
     '曾行有创机械通气的住院患者死亡数': 曾行有创机械通气的住院患者死亡数,
     '同期曾行有创机械通气的住院患者总人次数': 同期曾行有创机械通气的住院患者总人次数,
 }
+
+def get_indicators():
+    return list(BREATH_INDICATOR_FUNC_MAP.keys())
+
+def get_breath_indicator_detail(data: list, indicator: str) :
+    fn = BREATH_INDICATOR_FUNC_MAP.get(indicator)
+    if fn:
+        return fn(data)
+    return {
+        "data": [],
+        "value": 0,
+    }
