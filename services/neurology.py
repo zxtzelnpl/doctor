@@ -1,4 +1,4 @@
-from utils.doctor import is_dead, match_diagnosis, not_dead, not_match_diagnosis, out_from_neurology
+from utils.doctor import is_dead, match_diagnosis, not_match_diagnosis, out_from_neurology
 
 
 def is_neurology_department(year: str, department: str):
@@ -93,7 +93,7 @@ def 同期住院帕金森病患者总数(data: list):
         "value": len(filter),
     }
 
-BREATH_INDICATOR_FUNC_MAP = {
+INDICATOR_FUNC_MAP = {
     '同期神经内科收治脑梗死患者总例数': 同期神经内科收治脑梗死患者总例数,
     '同期神经内科收治患者总例数': 同期神经内科收治患者总例数,
     '同期神经内科收治脑出血患者总例数': 同期神经内科收治脑出血患者总例数,
@@ -104,20 +104,10 @@ BREATH_INDICATOR_FUNC_MAP = {
 }
 
 def get_indicators():
-    return [
-      '同期神经内科收治脑梗死患者总例数',
-      '同期神经内科收治患者总例数',
-      '同期神经内科收治脑出血患者总例数',
-      '神经内科收治惊厥性癫痫持续状态患者例数',
-      '同期神经内科癫痫住院患者总例数',
-      '神经内科收治惊厥性癫痫持续状态患者例数',
-      '同期神经内科收治患者总例数',
-      '神经内科住院患者死亡例数',
-      '同期住院帕金森病患者总数',
-    ]
+    return list(INDICATOR_FUNC_MAP.keys())
 
 def get_neurology_indicator_detail(data: list, indicator: str):
-    fn = BREATH_INDICATOR_FUNC_MAP.get(indicator)
+    fn = INDICATOR_FUNC_MAP.get(indicator)
     if fn:
         return fn(data)
     return {

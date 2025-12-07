@@ -7,7 +7,8 @@ from constants.header import (
     PRIMARY_DIAGNOSIS_HEADER, PRIMARY_DIAGNOSIS_HEADER1, PRIMARY_DIAGNOSIS_HEADER2, PRIMARY_DIAGNOSIS_HEADER3, PRIMARY_DIAGNOSIS_HEADER4,
     INTENSIVE_CARE_HEADER1, INTENSIVE_CARE_HEADER2, INTENSIVE_CARE_HEADER3, INTENSIVE_CARE_HEADER4, INTENSIVE_CARE_HEADER5,
     ADMIT_DIAGNOSIS_HEADER1, ADMIT_DIAGNOSIS_HEADER2, ADMIT_DIAGNOSIS_HEADER3, ADMIT_DIAGNOSIS_HEADER4, ADMIT_DIAGNOSIS_HEADER5,
-    SURGERY_OPERATION_HEADER
+    SURGERY_OPERATION_HEADER,
+    ACTUAL_INPATIENT_DAYS_HEADER
 )
 from typing import Dict
 from typing import Any
@@ -22,6 +23,13 @@ def out_from_breath(item: dict):
 
 def out_from_neurology(item: dict):
     return '神经' in item.get(DISCHARGE_WARD_HEADER, '')
+
+def out_from_endocrinology(item: dict):
+    """
+    判断是否从内分泌科出院。
+    """
+    return '内分泌' in item.get(DISCHARGE_WARD_HEADER, '')
+
 
 def match_admission_date(row, start_dt=None, end_dt=None):
     """
@@ -105,14 +113,19 @@ def not_dead(item: dict):
 def is_dead(item: dict):
     return item.get(DISCHARGE_METHOD_HEADER, '') == '5'
 
-def match_diagnosis(item: dict, diagnosis_codes: list):
-    return any(code.startswith(tuple(diagnosis_codes)) for code in [
-                item.get(PRIMARY_DIAGNOSIS_HEADER, ''),
-                item.get(PRIMARY_DIAGNOSIS_HEADER1, ''),
-                item.get(PRIMARY_DIAGNOSIS_HEADER2, ''),
-                item.get(PRIMARY_DIAGNOSIS_HEADER3, ''),
-                item.get(PRIMARY_DIAGNOSIS_HEADER4, ''),
-            ])
+def match_diagnosis(item: dict, diagnosis_codes: list, range: Dict[str, int] = {'from': 0, 'to': 5}):
+    headers = [
+        PRIMARY_DIAGNOSIS_HEADER,
+        PRIMARY_DIAGNOSIS_HEADER1,
+        PRIMARY_DIAGNOSIS_HEADER2,
+        PRIMARY_DIAGNOSIS_HEADER3,
+        PRIMARY_DIAGNOSIS_HEADER4,
+    ][range['from']:range['to']]
+
+    return any(
+        code.startswith(tuple(diagnosis_codes))
+        for code in (item.get(header, '') for header in headers)
+    )
 
 def not_match_diagnosis(item: dict, diagnosis_codes: list):
     return not match_diagnosis(item, diagnosis_codes)
@@ -174,8 +187,10 @@ def get_diagnosis_codes(file: str, sheet_index: int, name: str):
     
     return names
 
-
-def discharge_plan_in_31_days(data: list):
+def discharge_in_31_days(data: list):
+    """
+    筛选出出院在31天内又入院的记录。
+    """
     print(type(data[0][ADMIT_TIME_HEADER]))
     ID_HEADER = '身份证号(SFZH)'
     # 统计每个病人身份证号出现的次数
@@ -209,6 +224,9 @@ def discharge_plan_in_31_days(data: list):
     return next_res
 
 def match_surgery_operation(item: dict, operation_codes: list):
+    """
+    判断手术操作是否匹配给定的手术操作码列表。
+    """
     surgeryCode = item.get(SURGERY_OPERATION_HEADER, '')
     return any(surgeryCode.startswith(code) for code in operation_codes)
 
@@ -218,3 +236,16 @@ def has_invasive_mechanical_ventilation_treatment(item: dict):
         return float(raw) > 0
     except (ValueError, TypeError):
         return False
+    
+def get_actual_inpatient_days(data: list):
+    """
+    获取总实际住院天数。
+    """
+    total_days = 0
+    for item in data:
+        raw = item.get(ACTUAL_INPATIENT_DAYS_HEADER, "0")
+        try:
+            total_days += float(raw)
+        except (ValueError, TypeError):
+            continue
+    return total_days

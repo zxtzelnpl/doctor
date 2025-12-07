@@ -2,7 +2,7 @@ from constants.header import (
     PRIMARY_AGE_HEADER,
     DISCHARGE_PLAN_HEADER_IN_31_DAYS_HEADER
 )
-from utils.doctor import discharge_plan_in_31_days, get_diagnosis_codes, has_invasive_mechanical_ventilation_treatment, intensive_care_is_empty, intensive_care_is_not_empty, match_surgery_operation, out_from_breath, match_diagnosis, no_admit_diagnosis, not_dead, is_dead
+from utils.doctor import discharge_in_31_days, get_diagnosis_codes, has_invasive_mechanical_ventilation_treatment, intensive_care_is_empty, intensive_care_is_not_empty, match_surgery_operation, out_from_breath, match_diagnosis, no_admit_diagnosis, not_dead, is_dead
 
 def is_breath_department(year: str, department: str):
     if('呼吸' in department):
@@ -247,7 +247,7 @@ def 出院31_天内非预期再住院患者人次数(data: list):
         and item[DISCHARGE_PLAN_HEADER_IN_31_DAYS_HEADER] == '1'
     ]
 
-    next_res = discharge_plan_in_31_days(filtered)
+    next_res = discharge_in_31_days(filtered)
 
     return {
         "data": next_res,
