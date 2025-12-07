@@ -11,65 +11,12 @@ def is_breath_department(year: str, department: str):
 
 
 def get_indicators():
-    return [
-        '社区获得性肺炎出院患者总例数',
-        '肺血栓栓塞症出院患者总例数',
-        '慢性阻塞性肺疾病出院患者总例数',
-        '哮喘出院患者总例数',
-        '普通病房住院患者死亡总数',
-        '同期住院患者总人次数',
-        'MICU/RICU 住院患者死亡数',
-        '同期监护室住院患者总人次数',
-        '低风险病种住院患者死亡人数',
-        '（呼吸内科）呼吸机相关性肺炎（VAP）发生例数',
-        '（呼吸内科）同期住院患者有创机械通气总天数',
-        '（呼吸内科）血管内导管相关血流感染（CRBSI）发生例数',
-        '（呼吸内科）导尿管相关泌尿系感染（CAUTI）发生例数',
-        '同期下呼吸道感染住院患者总例数',
-        # '转出ICU 后48h 内重返ICU 的患者人次数',
-        '出院31 天内非预期再住院患者人次数',
-        # '哮喘/COPD 住院患者完成肺功能检查例数',
-        # '同期使用呼吸机患者总例数',
-        '曾行有创机械通气的住院患者死亡数',
-        '同期曾行有创机械通气的住院患者总人次数',
-    ]
+    return list(BREATH_INDICATOR_FUNC_MAP.keys())
 
 def get_breath_indicator_detail(data: list, indicator: str) :
-    if indicator == '社区获得性肺炎出院患者总例数':
-        return 社区获得性肺炎出院患者总例数(data)
-    elif indicator == '肺血栓栓塞症出院患者总例数':
-        return 肺血栓栓塞症出院患者总例数(data)
-    elif indicator == '慢性阻塞性肺疾病出院患者总例数':
-        return 慢性阻塞性肺疾病出院患者总例数(data)
-    elif indicator == '哮喘出院患者总例数':
-        return 哮喘出院患者总例数(data)
-    elif indicator == '普通病房住院患者死亡总数':
-        return 普通病房住院患者死亡总数(data)
-    elif indicator == '同期住院患者总人次数':
-        return 同期住院患者总人次数(data)
-    elif indicator == 'MICU/RICU 住院患者死亡数':
-        return MICU_RICU_住院患者死亡数(data)
-    elif indicator == '同期监护室住院患者总人次数':
-        return 同期监护室住院患者总人次数(data)
-    elif indicator == '低风险病种住院患者死亡人数':
-        return 低风险病种住院患者死亡人数(data)
-    elif indicator == '（呼吸内科）呼吸机相关性肺炎（VAP）发生例数':
-        return 呼吸内科_呼吸机相关性肺炎_VAP_发生例数(data)
-    elif indicator == '（呼吸内科）同期住院患者有创机械通气总天数':
-        return 呼吸内科_同期住院患者有创机械通气总天数(data)
-    elif indicator == '（呼吸内科）血管内导管相关血流感染（CRBSI）发生例数':
-        return 呼吸内科_血管内导管相关血流感染_CRBSI_发生例数(data)
-    elif indicator == '（呼吸内科）导尿管相关泌尿系统感染（CAUTI）发生例数':
-        return 呼吸内科_导尿管相关泌尿系统感染_CAUTI_发生例数(data)
-    elif indicator == '同期下呼吸道感染住院患者总例数':
-        return 同期下呼吸道感染住院患者总例数(data)
-    elif indicator == '出院31 天内非预期再住院患者人次数':
-        return 出院31_天内非预期再住院患者人次数(data)
-    elif indicator == '曾行有创机械通气的住院患者死亡数':
-        return 曾行有创机械通气的住院患者死亡数(data)
-    elif indicator == '同期曾行有创机械通气的住院患者总人次数':
-        return 同期曾行有创机械通气的住院患者总人次数(data)
-    
+    fn = BREATH_INDICATOR_FUNC_MAP.get(indicator)
+    if fn:
+        return fn(data)
     return {
         "data": [],
         "value": 0,
@@ -390,3 +337,23 @@ def 同期曾行有创机械通气的住院患者总人次数(data: list):
         "data": filtered,
         "value": len(filtered),
     }
+
+BREATH_INDICATOR_FUNC_MAP = {
+    '社区获得性肺炎出院患者总例数': 社区获得性肺炎出院患者总例数,
+    '肺血栓栓塞症出院患者总例数': 肺血栓栓塞症出院患者总例数,
+    '慢性阻塞性肺疾病出院患者总例数': 慢性阻塞性肺疾病出院患者总例数,
+    '哮喘出院患者总例数': 哮喘出院患者总例数,
+    '普通病房住院患者死亡总数': 普通病房住院患者死亡总数,
+    '同期住院患者总人次数': 同期住院患者总人次数,
+    'MICU/RICU 住院患者死亡数': MICU_RICU_住院患者死亡数,
+    '同期监护室住院患者总人次数': 同期监护室住院患者总人次数,
+    '低风险病种住院患者死亡人数': 低风险病种住院患者死亡人数,
+    '（呼吸内科）呼吸机相关性肺炎（VAP）发生例数': 呼吸内科_呼吸机相关性肺炎_VAP_发生例数,
+    '（呼吸内科）同期住院患者有创机械通气总天数': 呼吸内科_同期住院患者有创机械通气总天数,
+    '（呼吸内科）血管内导管相关血流感染（CRBSI）发生例数': 呼吸内科_血管内导管相关血流感染_CRBSI_发生例数,
+    '（呼吸内科）导尿管相关泌尿系感染（CAUTI）发生例数': 呼吸内科_导尿管相关泌尿系统感染_CAUTI_发生例数,
+    '同期下呼吸道感染住院患者总例数': 同期下呼吸道感染住院患者总例数,
+    '出院31 天内非预期再住院患者人次数': 出院31_天内非预期再住院患者人次数,
+    '曾行有创机械通气的住院患者死亡数': 曾行有创机械通气的住院患者死亡数,
+    '同期曾行有创机械通气的住院患者总人次数': 同期曾行有创机械通气的住院患者总人次数,
+}
