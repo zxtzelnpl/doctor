@@ -61,6 +61,20 @@ def 内分泌_重点病种患者例数(data: list):
         item for item in data
         if out_from_endocrinology(item)
         and (match_diagnosis(item, codes, {'from': 0, 'to': 1}))
+    ]
+
+    return {
+        "data": filter,
+        "value": len(filter),
+    }
+
+def 内分泌_重点病种患者例数_不包含死亡(data: list):
+    codes = get_diagnosis_codes('./back/内分泌科-重点专业单病种质控指标.xlsx', 1, '重点病种')
+
+    filter = [
+        item for item in data
+        if out_from_endocrinology(item)
+        and (match_diagnosis(item, codes, {'from': 0, 'to': 1}))
         and not_dead(item)
     ]
 
@@ -191,7 +205,7 @@ def 甲状腺结节患者行甲状腺细针穿刺活检例数(data: list):
     filter = [
         item for item in data
         if out_from_endocrinology(item)
-        and (match_diagnosis(item, ['D34.', 'E04.0', 'E04.1', 'E04.2', 'E04.9']))
+        and (match_diagnosis(item, ['D34.', 'E04.0', 'E04.1', 'E04.2', 'E04.9'], {'from': 0, 'to': 1}))
         and (match_surgery_operation(item, ['06.1100', '06.1101']))
     ]
     return {
@@ -205,7 +219,7 @@ def 同期甲状腺结节患者总例数(data: list):
     filter = [
         item for item in data
         if out_from_endocrinology(item)
-        and (match_diagnosis(item, ['D34.', 'E04.0', 'E04.1', 'E04.2', 'E04.9']))
+        and (match_diagnosis(item, ['D34.', 'E04.0', 'E04.1', 'E04.2', 'E04.9'], {'from': 0, 'to': 1}))
     ]
     return {
         "data": filter,
@@ -288,6 +302,7 @@ INDICATOR_FUNC_MAP = {
     '（内分泌）同期住院患者总病例数': 内分泌_同期住院患者总病例数,
     '（内分泌）实际使用的总床日数': 内分泌_实际使用的总床日数,
     '（内分泌）重点病种患者例数': 内分泌_重点病种患者例数,
+    '（内分泌）重点病种患者例数_不包含死亡': 内分泌_重点病种患者例数_不包含死亡,
     '（内分泌）疑难病种患者例数': 内分泌_疑难病种患者例数,
     '非糖尿病住院患者人次数': 非糖尿病住院患者人次数,
     '同期糖尿病酮症酸中毒患者总人次数': 同期糖尿病酮症酸中毒患者总人次数,
