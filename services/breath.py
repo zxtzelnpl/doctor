@@ -92,7 +92,6 @@ def 同期住院患者总人次数(data: list):
         item for item in data
         if out_from_breath(item)
         and intensive_care_is_empty(item)
-        and not_dead(item)
     ]
     return {
         "data": filtered,

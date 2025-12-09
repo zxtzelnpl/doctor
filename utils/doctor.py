@@ -127,8 +127,8 @@ def match_diagnosis(item: dict, diagnosis_codes: list, range: Dict[str, int] = {
         for code in (item.get(header, '') for header in headers)
     )
 
-def not_match_diagnosis(item: dict, diagnosis_codes: list):
-    return not match_diagnosis(item, diagnosis_codes)
+def not_match_diagnosis(item: dict, diagnosis_codes: list, range: Dict[str, int] = {'from': 0, 'to': 5}):
+    return not match_diagnosis(item, diagnosis_codes, range)
 
 def intensive_care_is_empty(item: dict):
     # 当所有字段都不存在（即为空字符串或 None）时返回 True

@@ -1,4 +1,13 @@
-from utils.doctor import get_actual_inpatient_days, get_diagnosis_codes, match_diagnosis, match_surgery_operation, no_admit_diagnosis, not_match_diagnosis, out_from_endocrinology
+from utils.doctor import (
+    get_actual_inpatient_days,
+    get_diagnosis_codes,
+    match_diagnosis,
+    match_surgery_operation,
+    no_admit_diagnosis,
+    not_match_diagnosis,
+    out_from_endocrinology,
+    not_dead
+)
 
 def is_endocrinology_department(year: str, department: str):
     if('内分泌' in department):
@@ -44,14 +53,17 @@ def 内分泌_实际使用的总床日数(data: list):
 # 肾上腺肿瘤、
 # 重度肥胖
 #（编码见字典表）的患者总数
+# 病案首页离院方式为非死亡
 def 内分泌_重点病种患者例数(data: list):
     codes = get_diagnosis_codes('./back/内分泌科-重点专业单病种质控指标.xlsx', 1, '重点病种')
 
     filter = [
         item for item in data
         if out_from_endocrinology(item)
-          and (match_diagnosis(item, codes))
+        and (match_diagnosis(item, codes, {'from': 0, 'to': 1}))
+        and not_dead(item)
     ]
+
     return {
         "data": filter,
         "value": len(filter),
@@ -65,7 +77,7 @@ def 内分泌_疑难病种患者例数(data: list):
     filter = [
         item for item in data
         if out_from_endocrinology(item)
-          and (match_diagnosis(item, codes))
+          and (match_diagnosis(item, codes, {'from': 0, 'to': 1}))
     ]
     return {
         "data": filter,
@@ -75,12 +87,19 @@ def 内分泌_疑难病种患者例数(data: list):
 # 1、病案首页出院科别为内分泌科
 # 2、病案首页出院主要诊断不是糖尿病相关诊断编码的患者数（糖尿病相关诊断编码见字典表）
 def 非糖尿病住院患者人次数(data: list):
-    codes = get_diagnosis_codes('./back/内分泌科-重点专业单病种质控指标.xlsx', 1, '糖尿病')
+    codes1 = get_diagnosis_codes('./back/内分泌科-重点专业单病种质控指标.xlsx', 1, '糖尿病')
+    codes2 = get_diagnosis_codes('./back/内分泌科-重点专业单病种质控指标.xlsx', 1, '2型糖尿病')
+    codes3 = get_diagnosis_codes('./back/内分泌科-重点专业单病种质控指标.xlsx', 1, '糖尿病高血糖高渗状态')
+    codes4 = get_diagnosis_codes('./back/内分泌科-重点专业单病种质控指标.xlsx', 1, '糖尿病酮症酸中毒')
+
+    codes = codes1 + codes2 + codes3 + codes4
+
+    print(len(codes))
 
     filter = [
         item for item in data
         if out_from_endocrinology(item)
-        and (not_match_diagnosis(item, codes))
+        and (not_match_diagnosis(item, codes, {'from': 0, 'to': 1}))
     ]
     return {
         "data": filter,
@@ -95,7 +114,7 @@ def 同期糖尿病酮症酸中毒患者总人次数(data: list):
     filter = [
         item for item in data
         if out_from_endocrinology(item)
-        and (match_diagnosis(item, codes))
+        and (match_diagnosis(item, codes, {'from': 0, 'to': 1}))
     ]
     return {
         "data": filter,
@@ -110,7 +129,7 @@ def 同期糖尿病高血糖高渗状态患者总人次数(data: list):
     filter = [
         item for item in data
         if out_from_endocrinology(item)
-        and (match_diagnosis(item, codes))
+        and (match_diagnosis(item, codes, {'from': 0, 'to': 1}))
     ]
     return {
         "data": filter,
@@ -120,12 +139,17 @@ def 同期糖尿病高血糖高渗状态患者总人次数(data: list):
 # 1、病案首页出院科别为内分泌科
 # 2、病案首页主要诊断为糖尿病相关编码（见字典表）
 def 同期糖尿病住院患者总人次数(data: list):
-    codes = get_diagnosis_codes('./back/内分泌科-重点专业单病种质控指标.xlsx', 1, '糖尿病')
+    codes1 = get_diagnosis_codes('./back/内分泌科-重点专业单病种质控指标.xlsx', 1, '糖尿病')
+    codes2 = get_diagnosis_codes('./back/内分泌科-重点专业单病种质控指标.xlsx', 1, '2型糖尿病')
+    codes3 = get_diagnosis_codes('./back/内分泌科-重点专业单病种质控指标.xlsx', 1, '糖尿病高血糖高渗状态')
+    codes4 = get_diagnosis_codes('./back/内分泌科-重点专业单病种质控指标.xlsx', 1, '糖尿病酮症酸中毒')
+
+    codes = codes1 + codes2 + codes3 + codes4
 
     filter = [
         item for item in data
         if out_from_endocrinology(item)
-        and (match_diagnosis(item, codes))
+        and (match_diagnosis(item, codes, {'from': 0, 'to': 1}))
     ]
     return {
         "data": filter,
@@ -153,7 +177,7 @@ def 同期甲状腺功能亢进症患者总例数(data: list):
     filter = [
         item for item in data
         if out_from_endocrinology(item)
-        and (match_diagnosis(item, ['E05.']))
+        and (match_diagnosis(item, ['E05.'], {'from': 0, 'to': 3}))
     ]
     return {
         "data": filter,
@@ -209,7 +233,7 @@ def 库欣综合征患者完成地塞米松试验的例数(data: list):
     filter = [
         item for item in data
         if out_from_endocrinology(item)
-        and (match_diagnosis(item, ['E24.']))
+        and (match_diagnosis(item, ['E24.'], {'from': 0, 'to': 3}))
     ]
     return {
         "data": filter,
@@ -222,7 +246,7 @@ def 同期库欣综合征患者总例数(data: list):
     filter = [
         item for item in data
         if out_from_endocrinology(item)
-        and (match_diagnosis(item, ['E24.']))
+        and (match_diagnosis(item, ['E24.'], {'from': 0, 'to': 3}))
     ]
     return {
         "data": filter,
