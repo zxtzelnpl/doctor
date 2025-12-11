@@ -55,19 +55,19 @@ async function fetchIndicators() {
   });
   if (!res.ok) throw new Error("加载指标失败");
   const data = await res.json();
-  let list = Array.isArray(data) ? data : (data.indicators || data.items || data.data || data.list || data.rows || []);
-  if (!Array.isArray(list) && list && typeof list === "object") list = Object.keys(list);
+  let list = Array.isArray(data) ? data : [];
   return list;
 }
 
-function buildRow(name) {
+function buildRow(indicatorItem) {
   const tr = document.createElement("tr");
   tr.className = "border-b align-top";
   const tdName = document.createElement("td");
   tdName.className = "px-3 py-2 text-gray-800";
-  tdName.textContent = name;
+  tdName.textContent = indicatorItem.indicator;
   const tdValue = document.createElement("td");
   tdValue.className = "px-3 py-2 text-sm text-gray-700";
+  tdValue.textContent = indicatorItem.number !== undefined ? indicatorItem.number : '--';
   const tdOps = document.createElement("td");
   tdOps.className = "px-3 py-2 space-x-2";
 
@@ -80,7 +80,7 @@ function buildRow(name) {
   btnDetail.className = "inline-block px-2 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700";
   btnDetail.addEventListener("click", () => {
     const params = getParamsFromSearch();
-    const detailParams = { ...params, indicator: name };
+    const detailParams = { ...params, indicator: indicatorItem.indicator };
     const detailUrl = `/data?${toQuery(detailParams)}`;
     window.open(detailUrl, "_blank");
   });
@@ -93,7 +93,7 @@ function buildRow(name) {
   btnDownload.className = "inline-block px-2 py-1 rounded bg-gray-600 text-white hover:bg-gray-700";
   btnDownload.addEventListener("click", () => {
     const params = getParamsFromSearch();
-    const downloadParams = { ...params, indicator: name };
+    const downloadParams = { ...params, indicator: indicatorItem.indicator };
     const downloadUrl = `/api/indicator/export?${toQuery(downloadParams)}`;
     window.open(downloadUrl, "_blank");
   });
@@ -107,7 +107,7 @@ function buildRow(name) {
     btnLoad.disabled = true;
     try {
       const params = getParamsFromSearch();
-      const detailParams = { ...params, indicator: name };
+      const detailParams = { ...params, indicator: indicatorItem.indicator };
 
       const res = await fetch(`/api/indicator/detail`, {
         method: "POST",
@@ -117,7 +117,7 @@ function buildRow(name) {
       if (!res.ok) throw new Error("加载明细失败");
       const data = await res.json(); 
       const value = data?.value ?? '--';
-      tdValue.innerHTML = value;
+      tdValue.textContent = value;
     } catch (e) {
       tdValue.textContent = String(e.message || e);
     } finally {
@@ -150,8 +150,8 @@ async function renderTable() {
       tbody.appendChild(tr);
       return;
     }
-    list.forEach(ind => {
-      const tr = buildRow(ind);
+    list.forEach(indicatorItem => {
+      const tr = buildRow(indicatorItem);
       tbody.appendChild(tr);
     });
   } catch (e) {

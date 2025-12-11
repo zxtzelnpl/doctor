@@ -28,12 +28,34 @@ def get_department_list():
 @api_bp.post('/indicators')
 def get_indicators():
     data_in = request.get_json(silent=True) or {}
-    year = data_in.get('year') or request.args.get('year')
-    department = data_in.get('department') or request.args.get('department')
+    year = data_in.get('year')
+    department = data_in.get('department')
     if not year or not department:
         return jsonify({'error': 'year and department are required'}), 400
+    
+    # 获取指标列表
     indicators = get_department_indicators(str(year), str(department))
-    return jsonify({'indicators': indicators})
+    
+    # 串行获取每个指标的详细数据
+    result_list = []
+    for indicator in indicators:
+        # 获取指标详细数据
+        result = get_indicator_detail({
+            'year': str(year),
+            'department': department,
+            'indicator': indicator
+        })
+        
+        # 构造返回格式
+        if result is not None:
+            result_list.append({
+                'department': department,
+                'year': year,
+                'indicator': indicator,
+                'number': result['value']
+            })
+    
+    return jsonify(result_list)
 
 @api_bp.post('/indicator/detail')
 def indicator_detail():
