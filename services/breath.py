@@ -16,7 +16,7 @@ def 社区获得性肺炎出院患者总例数(data: list):
     filtered = [
         item for item in data
         if out_from_breath(item)
-        and (match_diagnosis(item, ['J13.', 'J14.', 'J15.', 'J16.', 'J18.']))
+        and (match_diagnosis(item, ['J13.', 'J14.', 'J15.', 'J16.', 'J18.'], { 'from': 0, 'to':1}))
         and int(item.get(PRIMARY_AGE_HEADER, 0)) >= 18
         and not_dead(item)
     ]
@@ -31,7 +31,7 @@ def 肺血栓栓塞症出院患者总例数(data: list):
     filtered = [
         item for item in data
         if out_from_breath(item)
-        and (match_diagnosis(item, ['I26.900', 'I26.901', 'I26.000']))
+        and (match_diagnosis(item, ['I26.900', 'I26.901', 'I26.000'], { 'from': 0, 'to':1}))
         and not_dead(item)
     ]
     return {
@@ -45,7 +45,7 @@ def 慢性阻塞性肺疾病出院患者总例数(data: list):
     filtered = [
         item for item in data
         if out_from_breath(item)
-        and (match_diagnosis(item, ['J44.0', 'J44.1']))
+        and (match_diagnosis(item, ['J44.0', 'J44.1'], { 'from': 0, 'to':1}))
         and not_dead(item)
     ]
     return {
@@ -59,7 +59,7 @@ def 哮喘出院患者总例数(data: list):
     filtered = [
         item for item in data
         if out_from_breath(item)
-        and (match_diagnosis(item, ['J45.', 'J46.']))
+        and (match_diagnosis(item, ['J45.', 'J46.'], { 'from': 0, 'to':1}))
         and int(item.get(PRIMARY_AGE_HEADER, 0)) >= 18
         and not_dead(item)
     ]
@@ -136,7 +136,7 @@ def 低风险病种住院患者死亡人数(data: list):
     filtered = [
         item for item in data
         if out_from_breath(item)
-        and (match_diagnosis(item, ['J04.', 'J06.', 'J20.', 'J21.', 'J40.', 'J45.']))
+        and (match_diagnosis(item, ['J04.', 'J06.', 'J20.', 'J21.', 'J40.', 'J45.'], { 'from': 0, 'to':1}))
         and is_dead(item)
     ]
     return {
@@ -221,7 +221,7 @@ def 同期下呼吸道感染住院患者总例数(data: list):
     filtered = [
         item for item in data
         if out_from_breath(item)
-        and (match_diagnosis(item, diagnosis_codes))
+        and (match_diagnosis(item, diagnosis_codes, { 'from': 0, 'to':1}))
     ]
     return {
         "data": filtered,
