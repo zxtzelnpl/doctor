@@ -1,3 +1,5 @@
+from constants.header import ADMIT_WARD_HEADER
+
 from services.breath import (
     get_breath_indicator_detail,
     get_indicators as get_breath_indicators,
@@ -15,7 +17,21 @@ from services.neurology import (
     get_neurology_indicator_detail,   
     is_neurology_department
 )
-from constants.header import ADMIT_WARD_HEADER
+from services.gastroenterology import (
+    get_gastroenterology_indicator_detail,
+    get_indicators as get_gastroenterology_indicators,
+    is_gastroenterology_department
+)
+from services.endoscopy import (
+    get_endoscopy_indicator_detail,
+    get_indicators as get_endoscopy_indicators,
+    is_endoscopy_department
+)
+from services.general_surgery import (
+    get_general_surgery_indicator_detail,
+    get_indicators as get_general_surgery_indicators,
+    is_general_surgery_department
+)
 
 def get_all_departments(data: list):
     header = ADMIT_WARD_HEADER
@@ -35,12 +51,24 @@ def get_all_departments(data: list):
     return unique_departments
 
 def get_department_indicators(year: str, department: str):
+    # 呼吸
     if(is_breath_department(year, department)):
         return get_breath_indicators()
+    # 神经
     elif(is_neurology_department(year, department)):
         return get_neurology_indicators()
+    # 内分泌
     elif(is_endocrinology_department(year, department)):
         return get_endocrinology_indicators()
+    # 消化内科
+    elif(is_gastroenterology_department(year, department)):
+        return get_gastroenterology_indicators()
+    # 消化内镜
+    elif(is_endoscopy_department(year, department)):
+        return get_endoscopy_indicators()
+    # 普通外科
+    elif(is_general_surgery_department(year, department)):
+        return get_general_surgery_indicators()
     return [
         'test'
     ]
@@ -52,12 +80,24 @@ def get_indicator_detail(params: Dict[str, Any]) -> Dict[str, Any] | None:
     sheet = get_all_files_jsons(year)
     headers = sheet["headers"]
     data = sheet["data"]
+    # 呼吸
     if(is_breath_department(year, department)):
         result = get_breath_indicator_detail(data, indicator)
+    # 神经
     elif(is_neurology_department(year, department)):
         result = get_neurology_indicator_detail(data, indicator)
+    # 内分泌
     elif(is_endocrinology_department(year, department)):
         result = get_endocrinology_indicator_detail(data, indicator)
+    # 消化内科
+    elif(is_gastroenterology_department(year, department)):
+        result = get_gastroenterology_indicator_detail(data, indicator)
+    # 消化内镜
+    elif(is_endoscopy_department(year, department)):
+        result = get_endoscopy_indicator_detail(data, indicator)
+    # 普通外科
+    elif(is_general_surgery_department(year, department)):
+        result = get_general_surgery_indicator_detail(data, indicator)
     else:
         result = None
 
