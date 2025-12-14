@@ -117,7 +117,9 @@ def export_indicator():
         'discharge_end_dt': discharge_end_dt
     })
 
-    res = export_sheet(f"{year}{indicator}明细", value['headers'], value['data'])
+    sheet = value['sheet']
+
+    res = export_sheet(f"{year}{indicator}明细", sheet['headers'], sheet['data'])
     return send_file(
         res['output'],
         as_attachment=True,
