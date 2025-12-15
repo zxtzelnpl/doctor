@@ -79,12 +79,13 @@ def 同期收治的消化道出血患者总例数(data: list):
 # 3、病案首页出院所有诊断编码包含消化道出血病因诊断对应编码（见字典表）
 def 消化道出血患者出院诊断包含病因的例数(data: list):
     codes = get_diagnosis_codes('./back/消化内科-重点专业单病种质控指标.xlsx', 1, '消化道出血')
+    codes1 = get_diagnosis_codes('./back/消化内科-重点专业单病种质控指标.xlsx', 1, '消化道出血病因诊断')
 
     filter = [
         item for item in data
         if out_from_gastroenterology(item)
         and (match_diagnosis(item, codes), {'from':0, 'to': 1})
-        and (match_discharge_diagnosis(item, codes))
+        and (match_discharge_diagnosis(item, codes1))
     ]
     return {
         "data": filter,
@@ -100,6 +101,59 @@ def 消化道出血住院患者总例数(data: list):
         item for item in data
         if out_from_gastroenterology(item)
         and (match_diagnosis(item, codes, {'from': 0, 'to': 1}))
+    ]
+    return {
+        "data": filter,
+        "value": len(filter),
+    }
+
+long_codes = [
+    'K20.x00x011', 'K22.300x002','K22.600', 'K22.804', 'K25.000', 'K25.2\K25.4', 'K25.6', 
+    'K26.0', 'K26.2', 'K26.4', 'K26.6', 'K27.0', 'K27.2', 'K27.4', 'K27.6', 'K28.0', 'K28.2',
+    'K28.4', 'K28.600', 'K28.600x001', 'K29.0', 'K51.800x001', 'K55.000x022', 'K55.003', 'K55.100x011', 'K55.900x004',
+    'K62.100x002', 'K62.5', 'K62.800x001', 'K63.300x005', 'K63.800x012', 'K91.800x102', 'K91.800x103', 'K91.800x106', 
+    'K91.800x702', 'K91.800x706', 'K92.0', 'K92.100x001', 'K92.2', 'R19.501'
+]
+
+# 1、病案首页出院科别为消化内科
+# 2、病案首页主要诊断ICD-10编码：K20.x00x011、K22.300x002、K22.600、K22.804、K25.000、K25.2\K25.4、K25.6、K26.0、K26.2、K26.4、K26.6、K27.0、K27.2、K27.4、K27.6、K28.0、K28.2、K28.4、K28.600、K28.600x001、K29.0、K51.800x001K55.000x022、K55.003、K55.100x011、K55.900x004、K62.100x002、K62.5、K62.800x001、K63.300x005、K63.800x012、K91.800x102、K91.800x103、K91.800x106、K91.800x702、K91.800x706、K92.0、K92.100x001、K92.2、R19.501的出院患者
+def 同期收治的消化道出血患者总例数1(data: list):
+
+    filter = [
+        item for item in data
+        if out_from_gastroenterology(item)
+        and (match_diagnosis(item, long_codes, {'from': 0, 'to': 1}))
+    ]
+    return {
+        "data": filter,
+        "value": len(filter),
+    }
+
+# 1、病案首页出院科别为消化内科
+# 2、病案首页主要诊断ICD-10编码：K20.x00x011、K22.300x002、K22.600、K22.804、K25.000、K25.2、K25.4、K25.6、K26.0、K26.2、K26.4、K26.6、K27.0、K27.2、K27.4、K27.6、K28.0、K28.2、K28.4、K28.600、K28.600x001、K29.0、K51.800x001、K55.000x022、K55.003、K55.100x011、K55.900x004、K62.100x002、K62.5、K62.800x001、K63.300x005、K63.800x012、K91.800x102、K91.800x103、K91.800x106、K91.800x702、K91.800x706、K92.0、K92.100x001、K92.2、R19.501的出院患者
+# 3、病案首页出院所有诊断编码包含消化道出血病因诊断对应编码（见字典表）
+def 消化道出血患者出院诊断包含病因的例数1(data: list):
+    codes1 = get_diagnosis_codes('./back/消化内科-重点专业单病种质控指标.xlsx', 1, '消化道出血病因诊断')
+
+    filter = [
+        item for item in data
+        if out_from_gastroenterology(item)
+        and (match_diagnosis(item, long_codes), {'from':0, 'to': 1})
+        and (match_discharge_diagnosis(item, codes1))
+    ]
+    return {
+        "data": filter,
+        "value": len(filter),
+    }
+
+# 1、病案首页出院科别为消化内科
+# 2、病案首页主要诊断ICD-10编码：K20.x00x011、K22.300x002、K22.600、K22.804、K25.000、K25.2、K25.4、K25.6、K26.0、K26.2、K26.4、K26.6、K27.0、K27.2、K27.4、K27.6、K28.0、K28.2、K28.4、K28.600、K28.600x001、K29.0、K51.800x001、K55.000x022、K55.003、K55.100x011、K55.900x004、K62.100x002、K62.5、K62.800x001、K63.300x005、K63.800x012、K91.800x102、K91.800x103、K91.800x106、K91.800x702、K91.800x706、K92.0、K92.100x001、K92.2、R19.501的出院患者
+def 消化道出血住院患者总例数1(data: list):
+
+    filter = [
+        item for item in data
+        if out_from_gastroenterology(item)
+        and (match_diagnosis(item, long_codes, {'from': 0, 'to': 1}))
     ]
     return {
         "data": filter,
@@ -211,8 +265,11 @@ INDICATOR_FUNC_MAP = {
     '（消化内科）实际占用的总床日数': 实际占用的总床日数,
     '（消化内科）同期住院患者总例数': 同期住院患者总例数,
     '同期收治的消化道出血患者总例数': 同期收治的消化道出血患者总例数,
+    '同期收治的消化道出血患者总例数1': 同期收治的消化道出血患者总例数1,
     '消化道出血患者出院诊断包含病因的例数': 消化道出血患者出院诊断包含病因的例数,
+    '消化道出血患者出院诊断包含病因的例数1': 消化道出血患者出院诊断包含病因的例数1,
     '消化道出血住院患者总例数': 消化道出血住院患者总例数,
+    '消化道出血住院患者总例数1': 消化道出血住院患者总例数1,
     '同期炎症性肠病住院患者总例数': 同期炎症性肠病住院患者总例数,
     '病因明确的肝硬化患者例数': 病因明确的肝硬化患者例数,
     '同期肝硬化住院患者总例数': 同期肝硬化住院患者总例数,
