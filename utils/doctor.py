@@ -43,6 +43,14 @@ def out_from_gastroenterology(item: dict):
     """
     return '消化' in item.get(DISCHARGE_WARD_HEADER, '')
 
+def out_from_general_surgery(item: dict):
+    """
+    判断是否从普通外科出院。
+    """
+    return '外科一病区' in item.get(DISCHARGE_WARD_HEADER, '')
+
+
+
 def match_admission_date(row, start_dt=None, end_dt=None):
     """
     根据入院日期筛选记录。
